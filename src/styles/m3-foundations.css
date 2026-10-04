@@ -1,0 +1,296 @@
+/*
+ * Material Design 3 — non-color foundations.
+ * Typography, shape, elevation, motion and state-layer tokens, transcribed from the
+ * MD3 spec. Color roles live in m3-color-tokens.css (generated).
+ */
+
+:root {
+  /* ---------- Typeface ---------- */
+  --md-ref-typeface-brand: 'Roboto Flex Variable', 'Roboto Flex', 'Roboto', system-ui, sans-serif;
+  --md-ref-typeface-plain: 'Roboto Flex Variable', 'Roboto Flex', 'Roboto', system-ui, -apple-system,
+    'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei UI', 'Microsoft YaHei',
+    'Noto Sans SC', sans-serif;
+  --md-ref-typeface-mono: 'Fira Code', ui-monospace, 'SFMono-Regular', Consolas, monospace;
+  --md-ref-typeface-weight-regular: 400;
+  --md-ref-typeface-weight-medium: 500;
+  --md-ref-typeface-weight-bold: 700;
+
+  /* ---------- Shape ---------- */
+  --md-sys-shape-corner-none: 0;
+  --md-sys-shape-corner-extra-small: 4px;
+  --md-sys-shape-corner-small: 8px;
+  --md-sys-shape-corner-medium: 12px;
+  --md-sys-shape-corner-large: 16px;
+  --md-sys-shape-corner-large-increased: 20px;
+  --md-sys-shape-corner-extra-large: 28px;
+  --md-sys-shape-corner-extra-large-increased: 32px;
+  --md-sys-shape-corner-extra-extra-large: 48px;
+  --md-sys-shape-corner-full: 9999px;
+
+  /* ---------- Elevation (shadow) ---------- */
+  --md-sys-elevation-level0: none;
+  --md-sys-elevation-level1: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 1px 3px 1px rgb(0 0 0 / 0.15);
+  --md-sys-elevation-level2: 0 1px 2px 0 rgb(0 0 0 / 0.3), 0 2px 6px 2px rgb(0 0 0 / 0.15);
+  --md-sys-elevation-level3: 0 1px 3px 0 rgb(0 0 0 / 0.3), 0 4px 8px 3px rgb(0 0 0 / 0.15);
+  --md-sys-elevation-level4: 0 2px 3px 0 rgb(0 0 0 / 0.3), 0 6px 10px 4px rgb(0 0 0 / 0.15);
+  --md-sys-elevation-level5: 0 4px 4px 0 rgb(0 0 0 / 0.3), 0 8px 12px 6px rgb(0 0 0 / 0.15);
+
+  /* ---------- Motion: easing ---------- */
+  --md-sys-motion-easing-linear: cubic-bezier(0, 0, 1, 1);
+  --md-sys-motion-easing-standard: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-standard-accelerate: cubic-bezier(0.3, 0, 1, 1);
+  --md-sys-motion-easing-standard-decelerate: cubic-bezier(0, 0, 0, 1);
+  --md-sys-motion-easing-emphasized: cubic-bezier(0.2, 0, 0, 1);
+  --md-sys-motion-easing-emphasized-accelerate: cubic-bezier(0.3, 0, 0.8, 0.15);
+  --md-sys-motion-easing-emphasized-decelerate: cubic-bezier(0.05, 0.7, 0.1, 1);
+
+  /* ---------- Motion: duration ---------- */
+  --md-sys-motion-duration-short1: 50ms;
+  --md-sys-motion-duration-short2: 100ms;
+  --md-sys-motion-duration-short3: 150ms;
+  --md-sys-motion-duration-short4: 200ms;
+  --md-sys-motion-duration-medium1: 250ms;
+  --md-sys-motion-duration-medium2: 300ms;
+  --md-sys-motion-duration-medium3: 350ms;
+  --md-sys-motion-duration-medium4: 400ms;
+  --md-sys-motion-duration-long1: 450ms;
+  --md-sys-motion-duration-long2: 500ms;
+  --md-sys-motion-duration-long3: 550ms;
+  --md-sys-motion-duration-long4: 600ms;
+  --md-sys-motion-duration-extra-long1: 700ms;
+  --md-sys-motion-duration-extra-long2: 800ms;
+  --md-sys-motion-duration-extra-long4: 1000ms;
+
+  /* ---------- State layers ---------- */
+  --md-sys-state-hover-state-layer-opacity: 0.08;
+  --md-sys-state-focus-state-layer-opacity: 0.1;
+  --md-sys-state-pressed-state-layer-opacity: 0.1;
+  --md-sys-state-dragged-state-layer-opacity: 0.16;
+  --md-sys-state-focus-indicator-thickness: 3px;
+  --md-sys-state-focus-indicator-outer-offset: 2px;
+  --md-sys-state-disabled-content-opacity: 0.38;
+  --md-sys-state-disabled-container-opacity: 0.12;
+
+  /* ---------- Layout ---------- */
+  --md-sys-breakpoint-compact: 600px;
+  --md-sys-breakpoint-medium: 840px;
+  --md-sys-breakpoint-expanded: 1200px;
+  --md-sys-page-max-width: 1200px;
+  --md-sys-page-gutter: 16px;
+  --md-sys-top-app-bar-height: 64px;
+}
+
+@media (min-width: 840px) {
+  :root {
+    --md-sys-page-gutter: 24px;
+  }
+}
+
+/* ==========================================================================
+   Typography scale
+   Emitted twice: as custom properties and as ready-to-use .md-typescale-* classes.
+   ========================================================================== */
+
+:root {
+  --md-sys-typescale-display-large-size: 57px;
+  --md-sys-typescale-display-large-line-height: 64px;
+  --md-sys-typescale-display-large-tracking: -0.25px;
+  --md-sys-typescale-display-large-weight: 400;
+  --md-sys-typescale-display-medium-size: 45px;
+  --md-sys-typescale-display-medium-line-height: 52px;
+  --md-sys-typescale-display-medium-tracking: 0px;
+  --md-sys-typescale-display-medium-weight: 400;
+  --md-sys-typescale-display-small-size: 36px;
+  --md-sys-typescale-display-small-line-height: 44px;
+  --md-sys-typescale-display-small-tracking: 0px;
+  --md-sys-typescale-display-small-weight: 400;
+
+  --md-sys-typescale-headline-large-size: 32px;
+  --md-sys-typescale-headline-large-line-height: 40px;
+  --md-sys-typescale-headline-large-tracking: 0px;
+  --md-sys-typescale-headline-large-weight: 400;
+  --md-sys-typescale-headline-medium-size: 28px;
+  --md-sys-typescale-headline-medium-line-height: 36px;
+  --md-sys-typescale-headline-medium-tracking: 0px;
+  --md-sys-typescale-headline-medium-weight: 400;
+  --md-sys-typescale-headline-small-size: 24px;
+  --md-sys-typescale-headline-small-line-height: 32px;
+  --md-sys-typescale-headline-small-tracking: 0px;
+  --md-sys-typescale-headline-small-weight: 400;
+
+  --md-sys-typescale-title-large-size: 22px;
+  --md-sys-typescale-title-large-line-height: 28px;
+  --md-sys-typescale-title-large-tracking: 0px;
+  --md-sys-typescale-title-large-weight: 400;
+  --md-sys-typescale-title-medium-size: 16px;
+  --md-sys-typescale-title-medium-line-height: 24px;
+  --md-sys-typescale-title-medium-tracking: 0.15px;
+  --md-sys-typescale-title-medium-weight: 500;
+  --md-sys-typescale-title-small-size: 14px;
+  --md-sys-typescale-title-small-line-height: 20px;
+  --md-sys-typescale-title-small-tracking: 0.1px;
+  --md-sys-typescale-title-small-weight: 500;
+
+  --md-sys-typescale-body-large-size: 16px;
+  --md-sys-typescale-body-large-line-height: 24px;
+  --md-sys-typescale-body-large-tracking: 0.5px;
+  --md-sys-typescale-body-large-weight: 400;
+  --md-sys-typescale-body-medium-size: 14px;
+  --md-sys-typescale-body-medium-line-height: 20px;
+  --md-sys-typescale-body-medium-tracking: 0.25px;
+  --md-sys-typescale-body-medium-weight: 400;
+  --md-sys-typescale-body-small-size: 12px;
+  --md-sys-typescale-body-small-line-height: 16px;
+  --md-sys-typescale-body-small-tracking: 0.4px;
+  --md-sys-typescale-body-small-weight: 400;
+
+  --md-sys-typescale-label-large-size: 14px;
+  --md-sys-typescale-label-large-line-height: 20px;
+  --md-sys-typescale-label-large-tracking: 0.1px;
+  --md-sys-typescale-label-large-weight: 500;
+  --md-sys-typescale-label-large-weight-prominent: 700;
+  --md-sys-typescale-label-medium-size: 12px;
+  --md-sys-typescale-label-medium-line-height: 16px;
+  --md-sys-typescale-label-medium-tracking: 0.5px;
+  --md-sys-typescale-label-medium-weight: 500;
+  --md-sys-typescale-label-small-size: 11px;
+  --md-sys-typescale-label-small-line-height: 16px;
+  --md-sys-typescale-label-small-tracking: 0.5px;
+  --md-sys-typescale-label-small-weight: 500;
+}
+
+[class^='md-typescale-'],
+[class*=' md-typescale-'] {
+  font-family: var(--md-ref-typeface-plain);
+  font-weight: var(--md-type-weight, var(--md-ref-typeface-weight-regular));
+  font-size: var(--md-type-size);
+  line-height: var(--md-type-line-height);
+  letter-spacing: var(--md-type-tracking);
+  margin: 0;
+}
+
+.md-typescale-display-large {
+  --md-type-size: var(--md-sys-typescale-display-large-size);
+  --md-type-line-height: var(--md-sys-typescale-display-large-line-height);
+  --md-type-tracking: var(--md-sys-typescale-display-large-tracking);
+  --md-type-weight: var(--md-sys-typescale-display-large-weight);
+  font-family: var(--md-ref-typeface-brand);
+}
+.md-typescale-display-medium {
+  --md-type-size: var(--md-sys-typescale-display-medium-size);
+  --md-type-line-height: var(--md-sys-typescale-display-medium-line-height);
+  --md-type-tracking: var(--md-sys-typescale-display-medium-tracking);
+  --md-type-weight: var(--md-sys-typescale-display-medium-weight);
+  font-family: var(--md-ref-typeface-brand);
+}
+.md-typescale-display-small {
+  --md-type-size: var(--md-sys-typescale-display-small-size);
+  --md-type-line-height: var(--md-sys-typescale-display-small-line-height);
+  --md-type-tracking: var(--md-sys-typescale-display-small-tracking);
+  --md-type-weight: var(--md-sys-typescale-display-small-weight);
+  font-family: var(--md-ref-typeface-brand);
+}
+.md-typescale-headline-large {
+  --md-type-size: var(--md-sys-typescale-headline-large-size);
+  --md-type-line-height: var(--md-sys-typescale-headline-large-line-height);
+  --md-type-tracking: var(--md-sys-typescale-headline-large-tracking);
+  --md-type-weight: var(--md-sys-typescale-headline-large-weight);
+  font-family: var(--md-ref-typeface-brand);
+}
+.md-typescale-headline-medium {
+  --md-type-size: var(--md-sys-typescale-headline-medium-size);
+  --md-type-line-height: var(--md-sys-typescale-headline-medium-line-height);
+  --md-type-tracking: var(--md-sys-typescale-headline-medium-tracking);
+  --md-type-weight: var(--md-sys-typescale-headline-medium-weight);
+  font-family: var(--md-ref-typeface-brand);
+}
+.md-typescale-headline-small {
+  --md-type-size: var(--md-sys-typescale-headline-small-size);
+  --md-type-line-height: var(--md-sys-typescale-headline-small-line-height);
+  --md-type-tracking: var(--md-sys-typescale-headline-small-tracking);
+  --md-type-weight: var(--md-sys-typescale-headline-small-weight);
+  font-family: var(--md-ref-typeface-brand);
+}
+.md-typescale-title-large {
+  --md-type-size: var(--md-sys-typescale-title-large-size);
+  --md-type-line-height: var(--md-sys-typescale-title-large-line-height);
+  --md-type-tracking: var(--md-sys-typescale-title-large-tracking);
+  --md-type-weight: var(--md-sys-typescale-title-large-weight);
+}
+.md-typescale-title-medium {
+  --md-type-size: var(--md-sys-typescale-title-medium-size);
+  --md-type-line-height: var(--md-sys-typescale-title-medium-line-height);
+  --md-type-tracking: var(--md-sys-typescale-title-medium-tracking);
+  --md-type-weight: var(--md-sys-typescale-title-medium-weight);
+}
+.md-typescale-title-small {
+  --md-type-size: var(--md-sys-typescale-title-small-size);
+  --md-type-line-height: var(--md-sys-typescale-title-small-line-height);
+  --md-type-tracking: var(--md-sys-typescale-title-small-tracking);
+  --md-type-weight: var(--md-sys-typescale-title-small-weight);
+}
+.md-typescale-body-large {
+  --md-type-size: var(--md-sys-typescale-body-large-size);
+  --md-type-line-height: var(--md-sys-typescale-body-large-line-height);
+  --md-type-tracking: var(--md-sys-typescale-body-large-tracking);
+  --md-type-weight: var(--md-sys-typescale-body-large-weight);
+}
+.md-typescale-body-medium {
+  --md-type-size: var(--md-sys-typescale-body-medium-size);
+  --md-type-line-height: var(--md-sys-typescale-body-medium-line-height);
+  --md-type-tracking: var(--md-sys-typescale-body-medium-tracking);
+  --md-type-weight: var(--md-sys-typescale-body-medium-weight);
+}
+.md-typescale-body-small {
+  --md-type-size: var(--md-sys-typescale-body-small-size);
+  --md-type-line-height: var(--md-sys-typescale-body-small-line-height);
+  --md-type-tracking: var(--md-sys-typescale-body-small-tracking);
+  --md-type-weight: var(--md-sys-typescale-body-small-weight);
+}
+.md-typescale-label-large {
+  --md-type-size: var(--md-sys-typescale-label-large-size);
+  --md-type-line-height: var(--md-sys-typescale-label-large-line-height);
+  --md-type-tracking: var(--md-sys-typescale-label-large-tracking);
+  --md-type-weight: var(--md-sys-typescale-label-large-weight);
+}
+.md-typescale-label-medium {
+  --md-type-size: var(--md-sys-typescale-label-medium-size);
+  --md-type-line-height: var(--md-sys-typescale-label-medium-line-height);
+  --md-type-tracking: var(--md-sys-typescale-label-medium-tracking);
+  --md-type-weight: var(--md-sys-typescale-label-medium-weight);
+}
+.md-typescale-label-small {
+  --md-type-size: var(--md-sys-typescale-label-small-size);
+  --md-type-line-height: var(--md-sys-typescale-label-small-line-height);
+  --md-type-tracking: var(--md-sys-typescale-label-small-tracking);
+  --md-type-weight: var(--md-sys-typescale-label-small-weight);
+}
+
+/* ---------- Elevation helpers ---------- */
+.md-elevation-0 { box-shadow: var(--md-sys-elevation-level0); }
+.md-elevation-1 { box-shadow: var(--md-sys-elevation-level1); }
+.md-elevation-2 { box-shadow: var(--md-sys-elevation-level2); }
+.md-elevation-3 { box-shadow: var(--md-sys-elevation-level3); }
+.md-elevation-4 { box-shadow: var(--md-sys-elevation-level4); }
+.md-elevation-5 { box-shadow: var(--md-sys-elevation-level5); }
+
+/* ---------- Motion helpers ---------- */
+.md-motion-emphasized {
+  transition-timing-function: var(--md-sys-motion-easing-emphasized);
+}
+/* Reduced motion trims the slowest choreography; it does NOT zero the durations.
+   A 0ms/1ms collapse removes every state layer, hover and entrance transition and
+   makes the whole interface read as broken — and Chromium reports
+   prefers-reduced-motion: reduce whenever the Windows "animation effects" setting
+   is off, which is a very common desktop configuration. Continuous/decorative
+   loops are switched off per component instead (hero bob, heading gradient pan,
+   scroll behaviour), which is what the guidance actually targets. */
+@media (prefers-reduced-motion: reduce) {
+  :root {
+    --md-sys-motion-duration-long3: 300ms;
+    --md-sys-motion-duration-long4: 300ms;
+    --md-sys-motion-duration-extra-long1: 300ms;
+    --md-sys-motion-duration-extra-long2: 300ms;
+    --md-sys-motion-duration-extra-long4: 300ms;
+  }
+}

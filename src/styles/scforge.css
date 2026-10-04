@@ -1,0 +1,275 @@
+/*
+ * SCForge brand layer.
+ *
+ * Everything here is built on the MD3 tokens (m3-color-tokens.css /
+ * m3-foundations.css); no raw colors or magic numbers.
+ */
+
+:root {
+  /* A card that should read one step "above" the page: the container scale
+     inverts between modes, so the brightest step is container-lowest in light
+     and container-low in dark. */
+  --sc-surface-raised: var(--md-sys-color-surface-container-lowest);
+  --sc-surface-sunken: var(--md-sys-color-surface-container);
+  --sc-header-height: var(--md-sys-top-app-bar-height);
+  --sc-content-max: 1440px;
+  --sc-sidebar-width: 280px;
+}
+
+.dark {
+  --sc-surface-raised: var(--md-sys-color-surface-container-low);
+  --sc-surface-sunken: var(--md-sys-color-surface-container-lowest);
+}
+
+/* ---------- Page shell ---------- */
+.sc-page {
+  display: flex;
+  flex-direction: column;
+  min-height: 100dvh;
+}
+
+.sc-main {
+  flex: 1;
+}
+
+.sc-shell {
+  width: 100%;
+  max-width: var(--sc-content-max);
+  margin-inline: auto;
+  padding-inline: var(--md-sys-page-gutter);
+}
+
+/* ---------- Section rhythm ---------- */
+.sc-section {
+  padding-block: clamp(32px, 6vw, 64px);
+}
+
+.sc-section__head {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 16px;
+  flex-wrap: wrap;
+  margin-block-end: 20px;
+}
+
+.sc-section__title {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+/* ---------- Generic surfaces ---------- */
+.sc-panel {
+  background-color: var(--sc-surface-raised);
+  border-radius: var(--md-sys-shape-corner-large);
+  box-shadow: inset 0 0 0 1px var(--md-sys-color-outline-variant);
+}
+
+.sc-panel--filled {
+  background-color: var(--md-sys-color-surface-container);
+  box-shadow: none;
+}
+
+.sc-panel--padded {
+  padding: 20px;
+}
+
+/* ---------- Text helpers ---------- */
+.sc-muted {
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.sc-truncate {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.sc-clamp-2 {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.sc-clamp-3 {
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* ---------- Scrollbar-gutter for stable layouts ---------- */
+.sc-scroll-area {
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+/* ---------- Responsive helpers ---------- */
+.sc-hide-compact {
+  display: initial;
+}
+
+@media (max-width: 839px) {
+  .sc-hide-compact {
+    display: none !important;
+  }
+}
+
+.sc-only-compact {
+  display: none;
+}
+
+@media (max-width: 839px) {
+  .sc-only-compact {
+    display: initial;
+  }
+}
+
+/* ---------- Markdown 正文排版 ---------- */
+/* 只负责排版；结构由 marked 生成、内容已经过 DOMPurify 净化。 */
+.sc-markdown {
+  color: var(--md-sys-color-on-surface);
+  font-size: var(--md-sys-typescale-body-large-size);
+  line-height: var(--md-sys-typescale-body-large-line-height);
+  overflow-wrap: anywhere;
+}
+
+.sc-markdown--compact {
+  font-size: var(--md-sys-typescale-body-medium-size);
+  line-height: var(--md-sys-typescale-body-medium-line-height);
+}
+
+.sc-markdown > :first-child {
+  margin-block-start: 0;
+}
+
+.sc-markdown > :last-child {
+  margin-block-end: 0;
+}
+
+.sc-markdown h1,
+.sc-markdown h2,
+.sc-markdown h3,
+.sc-markdown h4,
+.sc-markdown h5,
+.sc-markdown h6 {
+  margin-block: 1.4em 0.6em;
+  font-family: var(--md-ref-typeface-brand);
+  font-weight: 600;
+  line-height: 1.3;
+}
+
+.sc-markdown h1 {
+  font-size: 1.6em;
+  padding-block-end: 0.3em;
+  border-block-end: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.sc-markdown h2 {
+  font-size: 1.35em;
+  padding-block-end: 0.3em;
+  border-block-end: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.sc-markdown h3 { font-size: 1.15em; }
+.sc-markdown h4 { font-size: 1em; }
+
+.sc-markdown p,
+.sc-markdown ul,
+.sc-markdown ol,
+.sc-markdown blockquote,
+.sc-markdown table,
+.sc-markdown pre {
+  margin-block: 0 0.9em;
+}
+
+.sc-markdown ul,
+.sc-markdown ol {
+  padding-inline-start: 1.5em;
+  list-style: revert;
+}
+
+.sc-markdown li + li {
+  margin-block-start: 0.25em;
+}
+
+.sc-markdown li > ul,
+.sc-markdown li > ol {
+  margin-block: 0.25em 0;
+}
+
+.sc-markdown a {
+  color: var(--md-sys-color-primary);
+  text-decoration: underline;
+  text-underline-offset: 2px;
+}
+
+.sc-markdown strong {
+  font-weight: 600;
+}
+
+.sc-markdown code {
+  padding: 0.15em 0.4em;
+  border-radius: var(--md-sys-shape-corner-extra-small);
+  background-color: var(--md-sys-color-surface-container-highest);
+  font-family: var(--md-ref-typeface-mono);
+  font-size: 0.9em;
+}
+
+.sc-markdown pre {
+  padding: 12px 14px;
+  border-radius: var(--md-sys-shape-corner-medium);
+  background-color: var(--md-sys-color-surface-container-highest);
+  overflow-x: auto;
+}
+
+.sc-markdown pre code {
+  padding: 0;
+  background: none;
+}
+
+.sc-markdown blockquote {
+  padding-inline-start: 14px;
+  border-inline-start: 3px solid var(--md-sys-color-primary);
+  color: var(--md-sys-color-on-surface-variant);
+}
+
+.sc-markdown table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 0.95em;
+}
+
+.sc-markdown th,
+.sc-markdown td {
+  padding: 8px 10px;
+  border: 1px solid var(--md-sys-color-outline-variant);
+  text-align: start;
+}
+
+.sc-markdown th {
+  background-color: var(--md-sys-color-surface-container);
+  font-weight: 600;
+}
+
+.sc-markdown hr {
+  margin-block: 1.4em;
+  border: 0;
+  border-block-start: 1px solid var(--md-sys-color-outline-variant);
+}
+
+.sc-markdown img {
+  max-width: 100%;
+  border-radius: var(--md-sys-shape-corner-medium);
+  background-color: var(--md-sys-color-surface-container-high);
+}
+
+.sc-markdown input[type='checkbox'] {
+  margin-inline-end: 6px;
+}
+
+.sc-markdown del {
+  color: var(--md-sys-color-on-surface-variant);
+}

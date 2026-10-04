@@ -1,0 +1,42 @@
+<!doctype html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="theme-color" content="#a03b00" media="(prefers-color-scheme: light)" />
+    <meta name="theme-color" content="#1a1210" media="(prefers-color-scheme: dark)" />
+    <meta
+      name="description"
+      content="SCForge —— 云术工作室（Cloudery Studio）旗下的生存战争插件、模组资源平台。插件（.dll）与模组（.netmod）分属两块独立的板，支持版本管理、审核、评论与社区评价。"
+    />
+    <meta name="keywords" content="SCForge,生存战争,SurvivalCraft,插件,模组,插件模组资源平台,插件下载,模组下载,netmod,云术工作室,Cloudery Studio" />
+    <meta name="author" content="云术工作室 Cloudery Studio" />
+    <meta name="publisher" content="云术工作室 Cloudery Studio" />
+    <meta property="og:title" content="SCForge · 生存战争插件、模组资源平台" />
+    <meta property="og:description" content="浏览、下载与发布生存战争插件与模组" />
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content="云术工作室 Cloudery Studio" />
+    <meta property="og:locale" content="zh_CN" />
+    <!-- SCForge 是云术工作室（Cloudery Studio）旗下项目；品牌常量见 src/data/brand.ts -->
+    <title>SCForge · 生存战争插件、模组资源平台 · 云术工作室</title>
+    <script>
+      // Resolve the colour scheme before first paint so there is no light flash.
+      ;(function () {
+        try {
+          var stored = localStorage.getItem('scforge-theme')
+          var prefersDark = window.matchMedia('(prefers-color-scheme: dark)').matches
+          var dark = stored === 'dark' || ((!stored || stored === 'system') && prefersDark)
+          if (dark) document.documentElement.classList.add('dark')
+          document.documentElement.style.colorScheme = dark ? 'dark' : 'light'
+        } catch (error) {
+          /* first paint falls back to the light scheme */
+        }
+      })()
+    </script>
+  </head>
+  <body>
+    <div id="app"></div>
+    <script type="module" src="/src/main.ts"></script>
+  </body>
+</html>

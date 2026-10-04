@@ -1,0 +1,77 @@
+/* Material Design 3 motion layer: shared keyframes, the light/dark
+   cross-fade and the smooth-scroll default. Component-level motion lives in the
+   components themselves; this file only holds what several of them share.
+
+   Duration and easing come from --md-sys-motion-* (m3-foundations.css), where
+   prefers-reduced-motion trims the slowest choreography rather than zeroing it. */
+
+html {
+  scroll-behavior: smooth;
+}
+
+/* ---------- Cross-fade while the colour scheme changes ---------- */
+/* useTheme() puts .md-theme-transition on <html> for the duration of a switch
+   so every themed surface fades instead of snapping. */
+html.md-theme-transition,
+html.md-theme-transition *,
+html.md-theme-transition *::before,
+html.md-theme-transition *::after {
+  transition:
+    background-color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    border-color var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    fill var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    stroke var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard),
+    box-shadow var(--md-sys-motion-duration-medium2) var(--md-sys-motion-easing-standard) !important;
+}
+
+/* ---------- Shared keyframes ---------- */
+@keyframes md-fade-up {
+  from {
+    opacity: 0;
+    transform: translateY(28px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes md-fade-in {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+@keyframes md-sheen {
+  from {
+    background-position: -120% 0;
+  }
+  to {
+    background-position: 220% 0;
+  }
+}
+
+@keyframes md-gradient-pan {
+  from {
+    background-position: 0% 50%;
+  }
+  to {
+    background-position: 200% 50%;
+  }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
+  }
+
+  /* Looping decorative motion gets a single pass; entrances keep playing. */
+  [class*='md-'] {
+    animation-iteration-count: 1;
+  }
+}
