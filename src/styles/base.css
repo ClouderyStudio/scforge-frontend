@@ -15,6 +15,11 @@
 html {
   -webkit-text-size-adjust: 100%;
   scroll-behavior: smooth;
+  /* 兜底：任何越界的装饰元素都不该让**整站**获得横向滚动能力。
+     用 clip 而非 hidden —— clip 不产生滚动容器，sticky 顶栏、fixed 层与各处
+     自身的横向滚动容器（代码块、表格）都不受影响。
+     这只防止「页面被拖走」，不解决元素自身的越界；越界仍按元素逐个修。 */
+  overflow-x: clip;
 }
 
 @media (prefers-reduced-motion: reduce) {

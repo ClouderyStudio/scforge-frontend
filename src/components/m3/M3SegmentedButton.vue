@@ -69,7 +69,10 @@ const emit = defineEmits<{ (e: 'update:modelValue', value: string): void }>()
   align-items: center;
   justify-content: center;
   gap: 8px;
-  flex: 1;
+  /* 按内容取宽。原来的 flex:1（basis 0）会把各段强行等分，标签长的那一段因此被
+     挤掉几个像素（后台「全部 / 待审核 / 已发布」实测切掉 7px）。只有 block 变体
+     才需要均分，见下面的覆盖规则。 */
+  flex: 0 1 auto;
   padding-inline: 16px;
   border: none;
   background-color: transparent;
@@ -81,6 +84,11 @@ const emit = defineEmits<{ (e: 'update:modelValue', value: string): void }>()
   cursor: pointer;
   user-select: none;
   transition: background-color var(--md-sys-motion-duration-short4) var(--md-sys-motion-easing-standard);
+}
+
+/* 通栏变体：均分段宽以填满容器。 */
+.md-segmented--block .md-segmented__item {
+  flex: 1 1 0;
 }
 
 .md-segmented__item + .md-segmented__item {
@@ -113,6 +121,17 @@ const emit = defineEmits<{ (e: 'update:modelValue', value: string): void }>()
 .md-segmented__label {
   position: relative;
   z-index: 3;
+}
+
+.md-segmented__check {
+  flex-shrink: 0;
+}
+
+/* 万一真的被压缩，宁可省略号，也不要被 .md-ripple-host 的 overflow:hidden 硬切。 */
+.md-segmented__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
 }
 
 .md-segmented__item.is-selected {

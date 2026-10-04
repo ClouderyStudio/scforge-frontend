@@ -107,23 +107,29 @@
 }
 
 /* ---------- Responsive helpers ---------- */
-.sc-hide-compact {
-  display: initial;
+/*
+ * 这两个 helper 都必须带 !important：M3 组件把 display 写在自己的 scoped 样式里
+ * （例如 .md-icon-btn[data-v-xxxx] 特异性 0-2-0），helper 只有 0-1-0，
+ * 不加 !important 会被反压回去 —— 「仅紧凑视口可见」的按钮会在桌面端照常显示。
+ */
+.sc-only-compact {
+  /* 恢复成多少由调用点决定：M3 的按钮类组件根元素都是 inline-flex。 */
+  --sc-compact-display: inline-flex;
+  display: none !important;
 }
 
 @media (max-width: 839px) {
+  /*
+   * 隐藏桌面端专属元素。基础态**不设** display：
+   * 元素该是 block 还是 flex 由它自己的样式（或 UA 默认值）决定，
+   * 写死 display: initial 会把 div / nav / form 一并压成 inline。
+   */
   .sc-hide-compact {
     display: none !important;
   }
-}
 
-.sc-only-compact {
-  display: none;
-}
-
-@media (max-width: 839px) {
   .sc-only-compact {
-    display: initial;
+    display: var(--sc-compact-display) !important;
   }
 }
 

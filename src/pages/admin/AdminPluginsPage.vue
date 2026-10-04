@@ -258,4 +258,18 @@ onMounted(load)
   background-color: var(--md-sys-color-error-container);
   color: var(--md-sys-color-on-error-container);
 }
+
+/* 窄屏：操作按钮换到下一行。
+   不换行时「编辑 + 打开详情 + 删除」会一直占着约 174px 不收缩，正文列被压到 83px，
+   长名称只能一字一行地竖排。与审核队列的 .sc-review__row 用同一套处理方式。 */
+@media (max-width: 719px) {
+  .sc-plugins__row {
+    flex-wrap: wrap;
+  }
+
+  .sc-plugins__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
 </style>

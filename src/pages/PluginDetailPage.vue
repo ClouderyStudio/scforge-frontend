@@ -512,12 +512,15 @@ onMounted(async () => {
 
 .sc-detail__title {
   font-family: var(--md-ref-typeface-brand);
+  /* 资源名里可能有超长的英文/下划线串，不允许它把 hero 顶宽（hero 会直接裁掉）。 */
+  overflow-wrap: anywhere;
 }
 
 .sc-detail__summary {
   max-width: 62ch;
   margin-block-start: 6px;
   color: var(--md-sys-color-on-surface-variant);
+  overflow-wrap: anywhere;
 }
 
 .sc-detail__author {
@@ -533,6 +536,9 @@ onMounted(async () => {
   flex-direction: column;
   align-items: flex-end;
   gap: 8px;
+  /* 不设上限时，这一列的最大内容宽度（模组提示那一整句）会成为整块 CTA 的宽度，
+     把 hero 撑破；hero 又是 overflow:hidden，多出来的部分会被静默切掉。 */
+  max-width: 100%;
 }
 
 .sc-detail__kind {
@@ -550,6 +556,10 @@ onMounted(async () => {
   display: flex;
   align-items: center;
   gap: 8px;
+  /* 手机上「评分 + 分享 + 编辑 + 发版」挤不进一行，必须允许换行；
+     否则这一行的最小内容宽度会直接决定整块 CTA 的宽度。 */
+  flex-wrap: wrap;
+  justify-content: flex-end;
 }
 
 /* ---------- Body ---------- */

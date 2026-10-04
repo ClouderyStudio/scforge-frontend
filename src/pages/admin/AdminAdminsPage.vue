@@ -415,4 +415,17 @@ onMounted(load)
   display: flex;
   flex-direction: column;
 }
+
+/* 窄屏：操作按钮换到下一行，别再挤占用户信息那一列。
+   与 .sc-review__row / .sc-plugins__row 用同一套处理方式。 */
+@media (max-width: 719px) {
+  .sc-admins__row {
+    flex-wrap: wrap;
+  }
+
+  .sc-admins__actions {
+    width: 100%;
+    justify-content: flex-end;
+  }
+}
 </style>

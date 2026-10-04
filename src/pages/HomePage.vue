@@ -269,6 +269,16 @@ onMounted(async () => {
 .sc-hero__title {
   max-width: 20ch;
   font-family: var(--md-ref-typeface-brand);
+  /* 手机上一行排不下「找到 合适的插件与模组」，断行会把「组」孤零零挤到第三行；
+     balance 把断行拉回词组边界。 */
+  text-wrap: balance;
+}
+
+@media (max-width: 479px) {
+  .sc-hero__title {
+    --md-type-size: 30px;
+    --md-type-line-height: 38px;
+  }
 }
 
 .sc-hero__accent {

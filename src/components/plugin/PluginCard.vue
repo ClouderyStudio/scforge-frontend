@@ -25,7 +25,7 @@ const score = computed(() => props.plugin.upvotes - props.plugin.downvotes)
       <PluginIcon :src="plugin.iconUrl" :name="plugin.name" :size="56" />
       <div class="sc-card__heading">
         <p class="sc-card__name md-typescale-title-medium">
-          {{ plugin.name }}
+          <span class="sc-card__label">{{ plugin.name }}</span>
           <span v-if="plugin.kind === 'mod'" class="md-tag sc-card__kind">模组</span>
           <M3Icon v-if="plugin.featured" :icon="IconVerified" :size="16" class="sc-card__verified" />
         </p>
@@ -113,8 +113,21 @@ const score = computed(() => props.plugin.upvotes - props.plugin.downvotes)
   gap: 6px;
   font-weight: var(--md-typescale-title-medium-weight);
   overflow: hidden;
-  text-overflow: ellipsis;
   white-space: nowrap;
+}
+
+/* 名称必须自己成为可收缩的盒子：
+   flex 容器里的裸文本会变成匿名 flex 项，其 min-width:auto 加上 nowrap 让宽度下限
+   等于整个名称的长度 —— 名称一长，后面的「模组」标签与认证图标会被推到容器外，
+   再被 .sc-card__name 的 overflow:hidden 整块切掉（表现为标记凭空消失，且省略号不生效）。 */
+.sc-card__label {
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.sc-card__kind {
+  flex-shrink: 0;
 }
 
 .sc-card__verified {

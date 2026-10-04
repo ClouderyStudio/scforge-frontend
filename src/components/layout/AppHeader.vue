@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { boardRoute } from '@/data/catalog'
-import { computed, ref } from 'vue'
+import { computed, onBeforeUnmount, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import {
   IconAdd,
@@ -45,6 +45,36 @@ const snackbar = useSnackbar()
 
 const term = ref(typeof route.query.q === 'string' ? route.query.q : '')
 const drawerOpen = ref(false)
+
+// 紧凑视口下顶栏不放行内搜索框（它会把顶栏顶到 416px，见 .sc-header__search 注释），
+// 改成一个搜索图标，点开后用抽屉里那个完整宽度的搜索框——所以抽屉要区分「导航」与「搜索」两种来意。
+const drawerIntent = ref<'nav' | 'search'>('nav')
+const drawerTitle = computed(() => (drawerIntent.value === 'search' ? '搜索' : '导航'))
+const drawerSearchRef = ref<HTMLInputElement | null>(null)
+let searchFocusTimer: number | undefined
+
+function clearSearchFocusTimer(): void {
+  if (searchFocusTimer !== undefined) {
+    window.clearTimeout(searchFocusTimer)
+    searchFocusTimer = undefined
+  }
+}
+
+function openDrawer(intent: 'nav' | 'search' = 'nav'): void {
+  drawerIntent.value = intent
+  drawerOpen.value = true
+  clearSearchFocusTimer()
+  if (intent !== 'search') return
+  // useModal 会在抽屉进场后把焦点交给第一个可聚焦元素（头部的关闭按钮），
+  // 这里等它落定再把焦点抢到搜索框上，移动端顺带拉起软键盘。
+  searchFocusTimer = window.setTimeout(() => {
+    searchFocusTimer = undefined
+    drawerSearchRef.value?.focus({ preventScroll: true })
+    drawerSearchRef.value?.select()
+  }, 240)
+}
+
+onBeforeUnmount(clearSearchFocusTimer)
 
 // 浏览是**一张**页面：插件 / 模组在页面内切换，导航栏不拆成两项。
 // 已经在模组板时，「浏览」继续指向模组板，免得点一下又被弹回插件板。
@@ -102,7 +132,7 @@ async function signOut(): Promise<void> {
         </span>
       </RouterLink>
 
-      <form class="sc-header__search" role="search" @submit.prevent="submitSearch">
+      <form class="sc-header__search sc-hide-compact" role="search" @submit.prevent="submitSearch">
         <M3Icon :icon="IconSearch" :size="20" class="sc-header__search-icon" />
         <input
           v-model="term"
@@ -138,6 +168,14 @@ async function signOut(): Promise<void> {
       </nav>
 
       <div class="sc-header__actions">
+        <M3IconButton
+          class="sc-only-compact"
+          :icon="IconSearch"
+          label="搜索"
+          variant="standard"
+          @click="openDrawer('search')"
+        />
+
         <M3Tooltip :text="isDark ? '切换到浅色' : '切换到深色'">
           <M3IconButton
             :icon="isDark ? IconLightMode : IconDarkMode"
@@ -185,20 +223,22 @@ async function signOut(): Promise<void> {
           :icon="IconMenu"
           label="打开导航菜单"
           variant="standard"
-          @click="drawerOpen = true"
+          @click="openDrawer('nav')"
         />
       </div>
     </div>
   </header>
 
-  <M3Sheet v-model="drawerOpen" side="end" size="min(320px, 86vw)" title="导航">
+  <M3Sheet v-model="drawerOpen" side="end" size="min(320px, 86vw)" :title="drawerTitle">
     <div class="sc-drawer">
       <form class="sc-drawer__search" role="search" @submit.prevent="submitSearch">
         <M3Icon :icon="IconSearch" :size="20" />
         <input
+          ref="drawerSearchRef"
           v-model="term"
           class="sc-drawer__input md-typescale-body-medium"
           type="search"
+          name="q"
           placeholder="搜索插件 / 模组…"
           aria-label="搜索插件与模组"
         />
@@ -328,6 +368,10 @@ async function signOut(): Promise<void> {
   align-items: center;
   gap: 8px;
   flex: 1;
+  /* flex 项的 min-width:auto 会让宽度下限落到 <input> 的固有宽度上（约 180px），
+     头部的最小宽度被撑到 416px —— 比任何手机都宽，整页因此可横向拖拽。
+     置 0 之后搜索框才能真正随视口收缩。 */
+  min-width: 0;
   max-width: 520px;
   height: 44px;
   padding-inline: 14px;
@@ -412,6 +456,8 @@ async function signOut(): Promise<void> {
   display: flex;
   align-items: center;
   gap: 8px;
+  /* 同 .sc-header__search：不置 0 就会被 input 的固有宽度顶穿抽屉外框。 */
+  min-width: 0;
   height: 48px;
   padding-inline: 14px;
   margin-block-end: 8px;
@@ -450,8 +496,10 @@ async function signOut(): Promise<void> {
     gap: 8px;
   }
 
-  .sc-header__search {
-    height: 40px;
+  /* 行内搜索框在紧凑视口被收起，靠它撑开的「把导航与操作推到右侧」也没了，
+     这里补回来，否则操作区会紧贴品牌标。 */
+  .sc-header__actions {
+    margin-inline-start: auto;
   }
 }
 </style>
