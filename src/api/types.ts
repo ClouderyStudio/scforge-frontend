@@ -152,6 +152,69 @@ export interface PluginSearchQuery {
 }
 
 /* ------------------------------------------------------------------ */
+/* API Key（机器凭据）                                                */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 作用域码，与后端 `ScforgeApiKeyScopes` 一一对应。
+ * `manage`（删除自己的插件、重提审核）不在自助可申请范围内，只能由超管在后台签发。
+ * 编辑插件资料与替换版本文件归 `publish` —— 它们同样要过审。
+ */
+export type ApiKeyScope = 'read' | 'publish' | 'manage'
+
+/** 后端直接下发中文状态串：有效 / 已吊销 / 已过期。 */
+export type ApiKeyStatus = '有效' | '已吊销' | '已过期'
+
+/** 一个可授予的作用域（后端下发目录，前端不硬编码）。 */
+export interface ApiKeyScopeOption {
+  key: ApiKeyScope
+  label: string
+  description: string
+}
+
+/** `GET /scforge/api-keys/scopes` 的响应。 */
+export interface ApiKeyScopeCatalog {
+  all: ApiKeyScope[]
+  /** 自助可申请的部分（不含 manage）。 */
+  selfService: ApiKeyScope[]
+  items: ApiKeyScopeOption[]
+}
+
+/**
+ * 一把 Key 的对外投影。
+ * **注意**：这里没有令牌明文 —— 库里只存哈希，界面只能显示 `prefix` 与 `maskedToken`。
+ */
+export interface ApiKeyRecord {
+  id: string
+  name: string
+  /** 令牌前缀，形如 `scf_a1b2`。 */
+  prefix: string
+  /** 掩码令牌，形如 `scf_a1b2…****`。 */
+  maskedToken: string
+  scopes: ApiKeyScope[]
+  scopeLabels: string[]
+  userId: string
+  userName: string
+  /** 一律为北京时间（UTC+8），与 SCForge 其余 DTO 一致。 */
+  createdAt: string
+  expiresAt: string | null
+  revokedAt: string | null
+  revokedReason: string | null
+  lastUsedAt: string | null
+  lastUsedIp: string | null
+  status: ApiKeyStatus
+  usable: boolean
+}
+
+/** 创建 / 轮换的响应：`token` 明文只在这里出现一次。 */
+export interface ApiKeyIssued {
+  success: boolean
+  token: string
+  key: ApiKeyRecord
+  notice: string
+}
+
+/* ------------------------------------------------------------------ */
 /* 投票                                                                */
 /* ------------------------------------------------------------------ */
 

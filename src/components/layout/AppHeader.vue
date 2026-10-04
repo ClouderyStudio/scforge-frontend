@@ -6,6 +6,7 @@ import {
   IconAdd,
   IconAdminPanelSettings,
   IconDarkMode,
+  IconKey,
   IconLightMode,
   IconLogin,
   IconLogout,
@@ -197,6 +198,7 @@ async function signOut(): Promise<void> {
             <p class="md-typescale-body-small sc-muted">{{ user?.email || '未提供邮箱' }}</p>
           </div>
           <M3MenuItem :icon="IconPerson" label="我的插件" @click="router.push({ name: 'dashboard' })" />
+          <M3MenuItem :icon="IconKey" label="API 密钥" @click="router.push({ name: 'api-keys' })" />
           <M3MenuItem :icon="IconUpload" label="发布新插件" @click="router.push({ name: 'upload' })" />
           <M3MenuItem
             v-if="isAdmin"
@@ -263,6 +265,15 @@ async function signOut(): Promise<void> {
       >
         <M3Icon :icon="IconPerson" :size="20" />
         我的插件
+      </RouterLink>
+      <RouterLink
+        v-if="isAuthenticated"
+        class="sc-drawer__link md-typescale-body-large"
+        :to="{ name: 'api-keys' }"
+        @click="drawerOpen = false"
+      >
+        <M3Icon :icon="IconKey" :size="20" />
+        API 密钥
       </RouterLink>
       <RouterLink
         v-else

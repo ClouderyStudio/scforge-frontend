@@ -65,6 +65,12 @@ const routes: RouteRecordRaw[] = [
     meta: { title: '我的资源', requiresAuth: true },
   },
   {
+    path: '/api-keys',
+    name: 'api-keys',
+    component: () => import('@/pages/ApiKeysPage.vue'),
+    meta: { title: 'API 密钥', requiresAuth: true },
+  },
+  {
     path: '/admin',
     component: () => import('@/pages/admin/AdminLayout.vue'),
     meta: { requiresAuth: true, requiresAdmin: true },
@@ -98,6 +104,13 @@ const routes: RouteRecordRaw[] = [
         name: 'admin-admins',
         component: () => import('@/pages/admin/AdminAdminsPage.vue'),
         meta: { title: '管理员与权限' },
+      },
+      {
+        // 只有超管能管别人的机器凭据 —— 挂在 requiresAdmin 之下，再由页面自己按身份隐藏按钮。
+        path: 'api-keys',
+        name: 'admin-api-keys',
+        component: () => import('@/pages/admin/AdminApiKeysPage.vue'),
+        meta: { title: 'API 密钥' },
       },
     ],
   },

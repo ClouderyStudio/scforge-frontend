@@ -11,6 +11,7 @@ import IconArrowBack from '~icons/material-symbols/arrow-back'
 import IconArrowForward from '~icons/material-symbols/arrow-forward'
 import IconArrowOutward from '~icons/material-symbols/arrow-outward'
 import IconArrowUpward from '~icons/material-symbols/arrow-upward'
+import IconAutorenew from '~icons/material-symbols/autorenew'
 import IconAutoAwesome from '~icons/material-symbols/auto-awesome'
 import IconBalance from '~icons/material-symbols/balance'
 import IconBolt from '~icons/material-symbols/bolt'
@@ -134,7 +135,7 @@ export {
 
 
 
-  IconAdd, IconApps, IconArrowBack, IconArrowForward, IconArrowOutward, IconArrowUpward,
+  IconAdd, IconApps, IconArrowBack, IconArrowForward, IconArrowOutward, IconArrowUpward, IconAutorenew,
   IconAutoAwesome, IconBalance, IconBolt, IconBook, IconBuild, IconBugReport,
   IconCalendarMonth, IconCategory, IconCheck, IconCheckCircle, IconChevronLeft,
   IconChevronRight, IconCircle, IconClose, IconCloudUpload, IconCode, IconComment,

@@ -85,10 +85,14 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 export const http = {
   get: <T>(path: string, query?: RequestOptions['query'], signal?: AbortSignal) =>
     request<T>(path, { query, signal }),
-  post: <T>(path: string, body?: unknown) => request<T>(path, { method: 'POST', body }),
-  put: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PUT', body }),
+  /** `query` 用于需要把参数放地址栏的 POST（如后台按 userId 签发）。 */
+  post: <T>(path: string, body?: unknown, query?: RequestOptions['query']) =>
+    request<T>(path, { method: 'POST', body, query }),
+  put: <T>(path: string, body?: unknown, query?: RequestOptions['query']) =>
+    request<T>(path, { method: 'PUT', body, query }),
   patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
-  del: <T>(path: string, body?: unknown) => request<T>(path, { method: 'DELETE', body }),
+  del: <T>(path: string, body?: unknown, query?: RequestOptions['query']) =>
+    request<T>(path, { method: 'DELETE', body, query }),
   /** multipart 上传；`method` 用于 PUT 形式的编辑端点（默认 POST）。 */
   upload: <T>(path: string, form: FormData, signal?: AbortSignal, method: string = 'POST') =>
     request<T>(path, { method, form, signal }),

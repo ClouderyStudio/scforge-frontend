@@ -7,6 +7,7 @@ import {
   IconBlock,
   IconGavel,
   IconInsights,
+  IconKey,
   IconPendingActions,
   IconSchedule,
   IconStorage,
@@ -24,6 +25,7 @@ const items = computed(() =>
     { name: 'admin-plugins', label: '插件管理', icon: IconStorage, show: isAdmin.value },
     { name: 'admin-game-versions', label: '游戏版本', icon: IconSchedule, show: isSuperAdmin.value },
     { name: 'admin-admins', label: '管理员', icon: IconGavel, show: isSuperAdmin.value },
+    { name: 'admin-api-keys', label: 'API 密钥', icon: IconKey, show: isSuperAdmin.value },
   ].filter((item) => item.show),
 )
 
