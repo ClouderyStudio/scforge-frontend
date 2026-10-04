@@ -98,6 +98,12 @@ async function copy(text: string): Promise<void> {
       </div>
       <pre class="sc-apikey__code"><code>{{ example }}</code></pre>
     </div>
+
+    <template #actions>
+      <M3Button variant="filled" :icon="IconCheck" @click="emit('update:modelValue', false)">
+        我已保存，关闭
+      </M3Button>
+    </template>
   </M3Dialog>
 </template>
 
