@@ -9,11 +9,13 @@ import {
   IconEdit,
   IconLanguage,
   IconLink,
+  IconLock,
   IconOpenInNew,
     IconPublic,
   IconRefresh,
   IconSchedule,
   IconShare,
+  IconShield,
   IconStorage,
   IconTag,
   IconAdminPanelSettings,
@@ -24,6 +26,7 @@ import {
 import { M3Button, M3Icon, M3IconButton, M3SegmentedButton, M3Tooltip } from '@/components/m3'
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import VersionList from '@/components/plugin/VersionList.vue'
+import AccessGate from '@/components/plugin/AccessGate.vue'
 import ScMarkdown from '@/components/markdown/ScMarkdown.vue'
 import CommentThread from '@/components/comment/CommentThread.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
@@ -78,7 +81,7 @@ async function load(): Promise<void> {
   notFound.value = false
   try {
     const result = await pluginsApi.detail(slug.value)
-    plugin.value = result.plugin
+    plugin.value = result.addon
   } catch (error) {
     plugin.value = null
     if (error instanceof ApiError && error.status === 404) notFound.value = true
@@ -87,9 +90,14 @@ async function load(): Promise<void> {
     loading.value = false
   }
 }
-
 async function loadComments(): Promise<void> {
   if (!plugin.value) return
+  // 无权访问时服务端会 403（评论树同样受隐私约束），别去发一个注定失败的请求。
+  if (plugin.value.hasAccess === false) {
+    comments.value = []
+    commentTotal.value = 0
+    return
+  }
   commentsLoading.value = true
   try {
     const result = await commentsApi.list(plugin.value.id)
@@ -165,7 +173,7 @@ async function resubmit(): Promise<void> {
   resubmitting.value = true
   try {
     const result = await pluginsApi.resubmit(item.id)
-    plugin.value = result.plugin
+    plugin.value = result.addon
     snackbar.success('已重新提交，等待审核')
   } catch (error) {
     snackbar.error(error instanceof Error ? error.message : '提交失败')
@@ -181,6 +189,27 @@ async function share(): Promise<void> {
   } catch {
     snackbar.error('复制失败，请手动复制地址栏链接')
   }
+}
+
+/**
+ * 当前调用者是否拿得到完整内容。
+ *
+ * 服务端对无权者只下发脱敏外壳（hasAccess=false 且正文 / 版本列表为空），
+ * 所以这不是前端判断 —— 直接读服务端给的标志位，避免两边规则漂移。
+ */
+const hasAccess = computed(() => plugin.value?.hasAccess !== false)
+
+/** 隐私插件且尚未解锁：详情区渲染解锁门，而不是空荡荡的描述页。 */
+const needsUnlock = computed(() => {
+  const item = plugin.value
+  if (!item) return false
+  return !hasAccess.value && (item.accessMode === 'password' || item.accessMode === 'whitelist')
+})
+
+/** 解锁成功后重新拉详情：令牌只是拿到访问权，内容仍要再取一次。 */
+async function onUnlocked(): Promise<void> {
+  await load()
+  if (plugin.value) await loadComments()
 }
 
 
@@ -219,6 +248,17 @@ onMounted(async () => {
               <p class="sc-detail__breadcrumb md-typescale-label-medium">
                 <span class="md-tag">{{ CATEGORY_LABELS[plugin.category] ?? plugin.category }}</span>
                 <span class="sc-muted">游戏版本 {{ plugin.gameVersion }}</span>
+                <!-- 隐私插件标记：作者与管理员一眼能看出这不是公开资源 -->
+                <span v-if="plugin.accessMode !== 'public'" class="md-tag md-tag--outlined">
+                  <M3Icon :icon="plugin.accessMode === 'password' ? IconLock : IconShield" :size="13" />
+                  {{
+                    plugin.accessMode === 'password'
+                      ? '口令访问'
+                      : plugin.accessMode === 'whitelist'
+                        ? '指定人员可见'
+                        : plugin.accessMode
+                  }}
+                </span>
               </p>
               <h1 class="sc-detail__title md-typescale-headline-large">{{ plugin.name }}</h1>
               <p class="sc-detail__summary md-typescale-body-large">{{ plugin.summary }}</p>
@@ -236,6 +276,7 @@ onMounted(async () => {
           </div>
 
           <div class="sc-detail__cta">
+            <!-- 无权访问时不下发版本列表（latest 为 null），这里自然不渲染下载按钮 -->
             <M3Button
               v-if="latest"
               variant="filled"
@@ -280,7 +321,7 @@ onMounted(async () => {
                 variant="outlined"
                 size="sm"
                 :icon="IconUploadFile"
-                @click="router.push({ name: 'upload', query: { plugin: plugin.id } })"
+                @click="router.push({ name: 'upload', query: { addon: plugin.id } })"
               >
                 发布新版本
               </M3Button>
@@ -324,7 +365,17 @@ onMounted(async () => {
 
       <!-- ---------- Body ---------- -->
       <div class="sc-shell sc-detail__body">
-        <div class="sc-detail__main">
+        <!-- 隐私插件未解锁：整块正文替换为解锁门，描述 / 版本 / 评论一概不渲染 -->
+        <AccessGate
+          v-if="needsUnlock"
+          class="sc-detail__gate"
+          :plugin-id="plugin.id"
+          :access-mode="plugin.accessMode"
+          :hint="plugin.accessHint"
+          @unlocked="onUnlocked"
+        />
+
+        <div v-else class="sc-detail__main">
           <M3SegmentedButton class="sc-detail__tabs" :options="tabs" :model-value="tab" aria-label="插件信息分区" @update:model-value="(v) => (tab = v)" />
 
           <!-- About -->
@@ -374,8 +425,8 @@ onMounted(async () => {
           </section>
         </div>
 
-        <!-- Sidebar -->
-        <aside class="sc-detail__side">
+        <!-- Sidebar：未解锁时不渲染（解锁门已横跨两列，侧栏再占一列会把版面撑乱） -->
+        <aside v-if="hasAccess" class="sc-detail__side">
           <section class="sc-side-card">
             <h2 class="sc-side-card__title md-typescale-title-small">
               <M3Icon :icon="IconStorage" :size="18" />
@@ -576,6 +627,15 @@ onMounted(async () => {
   display: flex;
   flex-direction: column;
   gap: 20px;
+}
+
+/*
+ * 解锁门横跨整个正文栅格（正文是「主区 + 侧栏」两列），
+ * 未解锁时侧栏内容同样不可见，所以让它占满两列而不是挤在主区里。
+ */
+.sc-detail__gate {
+  grid-column: 1 / -1;
+  min-width: 0;
 }
 
 .sc-detail__panel {

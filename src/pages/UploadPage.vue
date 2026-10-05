@@ -6,6 +6,7 @@ import {
   IconCloudUpload,
   IconInfo,
   IconInventory2,
+  IconLock,
   IconPublic,
   IconRocketLaunch,
   IconStorage,
@@ -17,7 +18,7 @@ import FileDrop from '@/components/ui/FileDrop.vue'
 import ScMarkdownEditor from '@/components/markdown/ScMarkdownEditor.vue'
 import { pluginsApi } from '@/api/plugins'
 import { useGameVersions } from '@/composables/useGameVersions'
-import type { PluginDetail, ResourceKind } from '@/api/types'
+import type { AccessMode, PluginDetail, ResourceKind } from '@/api/types'
 import {
   acceptForKind,
   CATEGORIES,
@@ -33,6 +34,7 @@ import {
   TAGS,
 } from '@/data/catalog'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { MIN_ACCESS_PASSWORD, NEW_ACCESS_MODES, toSegmentedOptions } from '@/data/access'
 
 const route = useRoute()
 const router = useRouter()
@@ -40,7 +42,7 @@ const snackbar = useSnackbar()
 
 /** When `?plugin=<id>` is present the page only publishes a new version. */
 const targetPluginId = computed(() => {
-  const value = route.query.plugin
+  const value = route.query.addon
   return typeof value === 'string' && value ? value : ''
 })
 const versionOnly = computed(() => Boolean(targetPluginId.value))
@@ -80,6 +82,20 @@ const gallery = ref<File[]>([])
 const pkg = ref<File | null>(null)
 
 /**
+ * 创建时的访问控制。
+ *
+ * 只给「公开 / 口令」两种：白名单依赖插件 Id（要先建出插件才能授权），
+ * 留给发布后在编辑页配。
+ */
+const privacy = ref({
+  accessMode: 'public' as AccessMode,
+  accessPassword: '',
+  accessHint: '',
+})
+
+const newAccessModeOptions = toSegmentedOptions(NEW_ACCESS_MODES)
+
+/**
  * 资源类型：插件（.dll，仅服务端）或模组（.netmod，会下发到客户端）。
  * 创建后不可更改；为已有资源追加版本时跟随它原本的类型。
  */
@@ -105,6 +121,8 @@ const canSubmit = computed(() => {
   if (!pkg.value) return false
   if (!form.value.version.trim()) return false
   if (versionOnly.value) return true
+  // 口令模式必须先填口令，否则发布出来的是一个谁都进不去的插件。
+  if (privacy.value.accessMode === 'password' && !privacy.value.accessPassword.trim()) return false
   return Boolean(
     form.value.name.trim() &&
       form.value.summary.trim() &&
@@ -172,6 +190,12 @@ function buildForm(): FormData {
   if (form.value.licenseUrl) data.append('licenseUrl', form.value.licenseUrl)
   if (form.value.donationUrl) data.append('donationUrl', form.value.donationUrl)
   if (form.value.discordUrl) data.append('discordUrl', form.value.discordUrl)
+  // 隐私：口令模式创建时必须给口令（后端会拒），公开模式无需任何字段。
+  if (privacy.value.accessMode === 'password') {
+    data.append('accessMode', privacy.value.accessMode)
+    data.append('accessPassword', privacy.value.accessPassword)
+    if (privacy.value.accessHint.trim()) data.append('accessHint', privacy.value.accessHint.trim())
+  }
   if (icon.value) data.append('icon', icon.value)
   for (const file of gallery.value) data.append('gallery', file)
   return data
@@ -193,7 +217,7 @@ async function submit(): Promise<void> {
     } else {
       const result = await pluginsApi.create(buildForm())
       snackbar.success('已提交，等待管理员审核')
-      await router.push(detailRoute(result.plugin.kind, result.plugin.slug))
+      await router.push(detailRoute(result.addon.kind, result.addon.slug))
     }
   } catch (caught) {
     error.value = caught instanceof Error ? caught.message : '提交失败，请稍后重试'
@@ -208,16 +232,16 @@ onMounted(async () => {
   loadingTarget.value = true
   try {
     const result = await pluginsApi.detail(targetPluginId.value)
-    kind.value = result.plugin.kind
-    target.value = result.plugin
-    if (!result.plugin.canManage) {
+    kind.value = result.addon.kind
+    target.value = result.addon
+    if (!result.addon.canManage) {
       notAuthor.value = true
       error.value = '你不是该插件的作者，无法为它发布新版本（管理员也只能隐藏，不能代发版本）。'
       return
     }
-    form.value.category = result.plugin.category
-    form.value.gameVersion = result.plugin.gameVersion
-    gameVersions.value = [result.plugin.gameVersion]
+    form.value.category = result.addon.category
+    form.value.gameVersion = result.addon.gameVersion
+    gameVersions.value = [result.addon.gameVersion]
   } catch (caught) {
     error.value = caught instanceof Error ? caught.message : '无法加载目标插件'
   } finally {
@@ -519,6 +543,50 @@ onMounted(async () => {
                 <input v-model="form.discordUrl" class="sc-input md-typescale-body-medium" placeholder="https://…" />
               </label>
             </div>
+          </section>
+
+          <section class="sc-form-card">
+            <h2 class="sc-form-card__title md-typescale-title-medium">
+              <M3Icon :icon="IconLock" :size="20" />
+              访问控制
+            </h2>
+            <p class="md-typescale-body-small sc-muted">
+              设为「口令访问」后插件<strong>不会出现在公开目录里</strong>，只能通过详情页链接 + 口令进入。
+              发布后仍可在编辑页随时切换，也可以改成只给指定人员可见。
+            </p>
+
+            <M3SegmentedButton
+              v-model="privacy.accessMode"
+              :options="newAccessModeOptions"
+              block
+              aria-label="访问方式"
+            />
+
+            <template v-if="privacy.accessMode === 'password'">
+              <label class="sc-field">
+                <span class="sc-field__label md-typescale-label-large">访问口令 *</span>
+                <input
+                  v-model="privacy.accessPassword"
+                  class="sc-input md-typescale-body-medium"
+                  type="password"
+                  autocomplete="new-password"
+                  :placeholder="`至少 ${MIN_ACCESS_PASSWORD} 个字符`"
+                />
+                <p class="md-typescale-body-small sc-muted">
+                  口令只存哈希、之后无法取回，忘了只能重设。
+                </p>
+              </label>
+
+              <label class="sc-field">
+                <span class="sc-field__label md-typescale-label-large">访问说明（可选）</span>
+                <input
+                  v-model="privacy.accessHint"
+                  class="sc-input md-typescale-body-medium"
+                  maxlength="200"
+                  placeholder="例如：Discord 群领取 / 仅供某版本测试"
+                />
+              </label>
+            </template>
           </section>
         </template>
 

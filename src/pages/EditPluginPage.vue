@@ -24,9 +24,9 @@ import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ScMarkdownEditor from '@/components/markdown/ScMarkdownEditor.vue'
 import VersionList from '@/components/plugin/VersionList.vue'
-import { pluginsApi } from '@/api/plugins'
+import { pluginsApi, accessApi } from '@/api/plugins'
 import { useGameVersions } from '@/composables/useGameVersions'
-import type { PluginDetail, PluginVersion, ReleaseChannel } from '@/api/types'
+import type { AccessCandidate, AccessGrant, AccessMode, PluginDetail, PluginVersion, ReleaseChannel } from '@/api/types'
 import {
   acceptForKind,
   CATEGORIES,
@@ -39,6 +39,7 @@ import {
 } from '@/data/catalog'
 import { CONTENT_STATUS_LABELS } from '@/data/review'
 import { useSnackbar } from '@/composables/useSnackbar'
+import { ACCESS_MODES, MAX_ACCESS_GRANTS, MIN_ACCESS_PASSWORD, toSegmentedOptions } from '@/data/access'
 
 const route = useRoute()
 const router = useRouter()
@@ -69,6 +70,22 @@ const icon = ref<File | null>(null)
 const gallery = ref<File[]>([])
 const clearIcon = ref(false)
 const clearGallery = ref(false)
+
+/* ---------------- 隐私访问设置 ---------------- */
+/**
+ * 口令只存哈希、取不回来，所以这里永远显示为空框 + 提示「留空表示不改」；
+ * 只要用户动了这个框就提交 `accessPassword`，否则后端按「未提供」处理。
+ */
+const privacy = ref({
+  accessMode: 'public' as AccessMode,
+  accessPassword: '',
+  accessHint: '',
+})
+/** 白名单编辑中的候选项（已授权的 + 正在搜的），只在 whitelist 模式下加载。 */
+const grants = ref<AccessGrant[]>([])
+const grantKeyword = ref('')
+const grantCandidates = ref<AccessCandidate[]>([])
+const grantsBusy = ref(false)
 
 /* ---------------- 版本编辑状态 ---------------- */
 const editingVersion = ref<string | null>(null)
@@ -102,6 +119,12 @@ const resourceKind = computed(() => plugin.value?.kind ?? (route.meta.kind as st
 const detailTarget = computed(() => detailRoute(resourceKind.value, slug.value))
 const canSeeHidden = computed(() => plugin.value?.canManage || plugin.value?.canManageContent)
 
+/** 该插件当前是否已设了口令 —— 决定输入框是「首次填写」还是「留空不改」的措辞。 */
+const itemHasPassword = computed(() => plugin.value?.hasAccessPassword ?? false)
+
+/** 分段按钮要的是 `{ value, label }`，与 `ACCESS_MODES` 的 `{ key, … }` 差一个字段名。 */
+const accessModeOptions = toSegmentedOptions(ACCESS_MODES)
+
 function syncForm(item: PluginDetail): void {
   form.value = {
     summary: item.summary,
@@ -117,6 +140,64 @@ function syncForm(item: PluginDetail): void {
     discordUrl: item.discordUrl ?? '',
   }
   tags.value = [...item.tags]
+  privacy.value = {
+    accessMode: item.accessMode,
+    // 口令不可逆，只能重设：永远清空输入框，改用它 = 换新口令。
+    accessPassword: '',
+    // 提示语是可读字段，取回来回填，否则作者一进页面就看到空框、不知道原来写了什么。
+    accessHint: item.accessHint ?? '',
+  }
+  grantCandidates.value = []
+  grantKeyword.value = ''
+  if (item.accessMode === 'whitelist') void loadGrants()
+}
+
+async function loadGrants(): Promise<void> {
+  const id = plugin.value?.id
+  if (!id) return
+  grantsBusy.value = true
+  try {
+    grants.value = (await accessApi.listGrants(id)).items
+  } catch (error) {
+    snackbar.error(error instanceof Error ? error.message : '读取授权名单失败')
+  } finally {
+    grantsBusy.value = false
+  }
+}
+
+async function searchGrantCandidates(): Promise<void> {
+  grantsBusy.value = true
+  try {
+    const result = await accessApi.searchUsers(grantKeyword.value)
+    // 已在名单里的人不再重复出现。
+    const taken = new Set(grants.value.map((g) => g.userId))
+    grantCandidates.value = result.items.filter((u) => !taken.has(u.userId))
+    if (grantCandidates.value.length === 0) {
+      snackbar.show(grantKeyword.value.trim() ? '没找到匹配的用户' : '没有更多用户了')
+    }
+  } catch (error) {
+    snackbar.error(error instanceof Error ? error.message : '搜索用户失败')
+  } finally {
+    grantsBusy.value = false
+  }
+}
+
+function addGrant(candidate: AccessCandidate): void {
+  if (grants.value.some((g) => g.userId === candidate.userId)) return
+  if (grants.value.length >= MAX_ACCESS_GRANTS) {
+    snackbar.show(`授权名单最多 ${MAX_ACCESS_GRANTS} 人`)
+    return
+  }
+  grants.value = [
+    ...grants.value,
+    // createdAt 只用于展示，加进来时给个占位值；保存后以后端返回的为准。
+    { userId: candidate.userId, username: candidate.username, createdAt: '' },
+  ]
+  grantCandidates.value = grantCandidates.value.filter((u) => u.userId !== candidate.userId)
+}
+
+function removeGrant(userId: string): void {
+  grants.value = grants.value.filter((g) => g.userId !== userId)
 }
 
 async function load(): Promise<void> {
@@ -124,12 +205,12 @@ async function load(): Promise<void> {
   denied.value = false
   try {
     const result = await pluginsApi.detail(slug.value)
-    plugin.value = result.plugin
-    if (!result.plugin.canManage && !result.plugin.canManageContent) {
+    plugin.value = result.addon
+    if (!result.addon.canManage && !result.addon.canManageContent) {
       denied.value = true
       return
     }
-    syncForm(result.plugin)
+    syncForm(result.addon)
   } catch (error) {
     denied.value = true
     snackbar.error(error instanceof Error ? error.message : '加载插件失败')
@@ -186,15 +267,33 @@ async function save(): Promise<void> {
   for (const file of gallery.value) data.append('gallery', file)
   if (clearGallery.value) data.append('clearGallery', 'true')
 
+  /* 隐私字段。服务端按「字段是否出现」判定：
+     - accessMode 一律提交（不提交就保持原模式）；
+     - accessPassword 只在用户动过框时提交，否则后端沿用旧口令；
+     - accessHint 在口令模式下提交（空串 = 清除提示语）。 */
+  data.append('accessMode', privacy.value.accessMode)
+  if (privacy.value.accessMode === 'password') {
+    if (privacy.value.accessPassword.trim()) {
+      data.append('accessPassword', privacy.value.accessPassword)
+    }
+    data.append('accessHint', privacy.value.accessHint)
+  }
+  if (privacy.value.accessMode === 'whitelist') {
+    // 整体替换语义：每次都提交完整名单（空数组即清空）。
+    for (const grant of grants.value) data.append('accessGrantUserIds', grant.userId)
+  }
+
   saving.value = true
   try {
     const result = await pluginsApi.update(item.id, data)
-    plugin.value = result.plugin
-    syncForm(result.plugin)
+    plugin.value = result.addon
+    syncForm(result.addon)
     icon.value = null
     gallery.value = []
     clearIcon.value = false
     clearGallery.value = false
+    // 名单以后端返回为准（去掉被后端剔除的作者本人、补齐快照信息）。
+    if (privacy.value.accessMode === 'whitelist') await loadGrants()
     snackbar.success('已保存，插件重新进入待审核')
   } catch (error) {
     snackbar.error(error instanceof Error ? error.message : '保存失败')
@@ -297,7 +396,7 @@ async function resubmitVersion(version: PluginVersion): Promise<void> {
 
 async function reloadVersions(focusId?: string): Promise<void> {
   const result = await pluginsApi.detail(slug.value)
-  plugin.value = result.plugin
+  plugin.value = result.addon
   void focusId
 }
 
@@ -474,6 +573,112 @@ onMounted(() => {
           </div>
         </section>
 
+        <!-- ---------------- 隐私访问 ---------------- -->
+        <section class="sc-form-card">
+          <h2 class="sc-form-card__title md-typescale-title-medium">
+            <M3Icon :icon="IconLock" :size="20" />
+            访问控制
+          </h2>
+          <p class="md-typescale-body-small sc-muted">
+            设为「口令访问」或「指定人员可见」后，插件<strong>不会出现在公开目录里</strong>，
+            只能通过详情页链接进入。改访问方式<strong>不会</strong>让插件重新进入待审核。
+          </p>
+
+          <M3SegmentedButton
+            v-model="privacy.accessMode"
+            :options="accessModeOptions"
+            block
+            aria-label="访问方式"
+          />
+          <p class="md-typescale-body-small sc-muted">
+            {{ ACCESS_MODES.find((m) => m.key === privacy.accessMode)?.description }}
+          </p>
+
+          <template v-if="privacy.accessMode === 'password'">
+            <label class="sc-field">
+              <span class="sc-field__label md-typescale-label-large">访问口令</span>
+              <input
+                v-model="privacy.accessPassword"
+                class="sc-input md-typescale-body-medium"
+                type="password"
+                autocomplete="new-password"
+                :placeholder="
+                  itemHasPassword
+                    ? `已设置口令（留空表示不修改）· 至少 ${MIN_ACCESS_PASSWORD} 个字符`
+                    : `至少 ${MIN_ACCESS_PASSWORD} 个字符`
+                "
+              />
+              <p class="md-typescale-body-small sc-muted">
+                <template v-if="itemHasPassword">
+                  口令只存哈希、无法取回。留空即保持原口令；<b>填入新值会换掉旧口令</b>，
+                  已发出去的解锁令牌同时失效。
+                </template>
+                <template v-else>首次设为口令访问时必须填写。</template>
+              </p>
+            </label>
+
+            <label class="sc-field">
+              <span class="sc-field__label md-typescale-label-large">访问说明（可选）</span>
+              <input
+                v-model="privacy.accessHint"
+                class="sc-input md-typescale-body-medium"
+                maxlength="200"
+                placeholder="例如：Discord 群领取 / 仅供某版本测试"
+              />
+              <p class="md-typescale-body-small sc-muted">
+                会显示在解锁框下方，用来告诉访客去哪里拿口令。
+              </p>
+            </label>
+          </template>
+
+          <template v-else-if="privacy.accessMode === 'whitelist'">
+            <div class="sc-field">
+              <span class="sc-field__label md-typescale-label-large">
+                授权人员（已授权 {{ grants.length }} / {{ MAX_ACCESS_GRANTS }}）
+              </span>
+
+              <ul v-if="grants.length" class="sc-grant-list">
+                <li v-for="grant in grants" :key="grant.userId" class="sc-grant">
+                  <M3Icon :icon="IconCheckCircle" :size="18" class="sc-grant__ok" />
+                  <span class="sc-grant__name">{{ grant.username }}</span>
+                  <M3IconButton
+                    :icon="IconDelete"
+                    size="sm"
+                    :label="`移除 ${grant.username}`"
+                    @click="removeGrant(grant.userId)"
+                  />
+                </li>
+              </ul>
+              <p v-else class="md-typescale-body-small sc-muted">
+                还没有授权任何人。没有名单的话，除你与管理员外谁都进不来。
+              </p>
+
+              <div class="sc-grant-add">
+                <input
+                  v-model="grantKeyword"
+                  class="sc-input md-typescale-body-medium"
+                  placeholder="按用户名或邮箱搜索"
+                  @keyup.enter.prevent="searchGrantCandidates"
+                />
+                <M3Button variant="tonal" :disabled="grantsBusy" @click="searchGrantCandidates">
+                  搜索
+                </M3Button>
+              </div>
+
+              <ul v-if="grantCandidates.length" class="sc-grant-list sc-grant-list--candidates">
+                <li v-for="candidate in grantCandidates" :key="candidate.userId" class="sc-grant">
+                  <M3Icon :icon="IconAdd" :size="18" class="sc-grant__ok" />
+                  <span class="sc-grant__name">
+                    {{ candidate.username }}
+                    <small v-if="candidate.email" class="sc-muted">{{ candidate.email }}</small>
+                  </span>
+                  <M3Button variant="text" @click="addGrant(candidate)">加入</M3Button>
+                </li>
+              </ul>
+            </div>
+          </template>
+        </section>
+
         <div class="sc-edit__actions">
           <M3Button variant="text" @click="router.push(detailTarget)">取消</M3Button>
           <M3Button variant="filled" type="submit" :icon="IconSave" :disabled="saving">
@@ -496,7 +701,7 @@ onMounted(() => {
             <M3Button
               variant="tonal"
               :icon="IconAdd"
-              @click="router.push({ name: 'upload', query: { plugin: plugin.id } })"
+              @click="router.push({ name: 'upload', query: { addon: plugin.id } })"
             >
               填写新版本
             </M3Button>
@@ -698,6 +903,69 @@ onMounted(() => {
   align-items: center;
   gap: 8px;
   font-weight: var(--md-typescale-title-medium-weight);
+}
+
+/* ---------------- 访问控制（白名单编辑器） ---------------- */
+
+.sc-grant-list {
+  list-style: none;
+  margin: 8px 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 4px;
+  max-height: 260px;
+  overflow-y: auto;
+}
+
+.sc-grant {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  padding: 6px 12px;
+  border-radius: var(--md-sys-shape-corner-small);
+  background-color: var(--md-sys-color-surface-container-high);
+}
+
+/* 名字是 flex 子项里的裸文本：不写 min-width:0 的话 nowrap 文本撑不回去，长用户名会顶宽整行。 */
+.sc-grant__name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.sc-grant__ok {
+  color: var(--md-sys-color-primary);
+  flex: none;
+}
+
+.sc-grant-list--candidates {
+  max-height: 200px;
+}
+
+.sc-grant-add {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+/* flex 子项里的 input 必须 min-width:0，否则固有宽度（约 180px）会把整行顶宽。 */
+.sc-grant-add .sc-input {
+  flex: 1;
+  min-width: 0;
+}
+
+@media (max-width: 479px) {
+  .sc-grant-add {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }
 
 .sc-field {

@@ -27,6 +27,17 @@ export type ResourceKind = 'plugin' | 'mod'
 /** 先审后发：插件与版本各自持有这个状态。 */
 export type ContentStatus = 'pending' | 'published' | 'rejected'
 
+/**
+ * 访问方式（与后端 `ScforgeAccessMode` 一一对应）：
+ * - `public`：公开，进目录，任何人可下载。
+ * - `password`：口令访问，不进目录；提交口令换取解锁令牌后可访问。
+ * - `whitelist`：指定人员可见，不进目录；只有名单内用户可访问。
+ *
+ * 隐私插件**不进公开目录**（搜索 / 精选 / 最近都看不到），但能通过 slug 直达详情页 ——
+ * 作者需要这个链接才能把访问权分享出去。
+ */
+export type AccessMode = 'public' | 'password' | 'whitelist'
+
 /* ------------------------------------------------------------------ */
 /* 插件                                                                */
 /* ------------------------------------------------------------------ */
@@ -68,6 +79,11 @@ export interface PluginSummary {
   reviewNote: string | null
   reviewedAt: string | null
   reviewedBy: string | null
+  /**
+   * 访问方式。隐私插件（password / whitelist）不进公开目录，
+   * 只能通过 slug 直达详情页。
+   */
+  accessMode: AccessMode
 }
 
 export interface PluginDetail extends PluginSummary {
@@ -80,6 +96,21 @@ export interface PluginDetail extends PluginSummary {
   donationUrl: string | null
   discordUrl: string | null
   gallery: string[]
+  /**
+   * 当前调用者是否已获授权。为 false 时服务端只下发脱敏外壳：
+   * description / readme / gallery / versions 全为空，界面应渲染解锁门。
+   */
+  hasAccess: boolean
+  /** 是否已通过口令解锁（仅 accessMode === 'password' 时可能为 true）。 */
+  accessUnlocked: boolean
+  /** 作者留的访问说明，显示在解锁框下方。 */
+  accessHint: string | null
+  /**
+   * 是否已设置口令。口令只存哈希、取不回来，
+   * 编辑页靠它区分「首次填写」与「留空表示不修改」——
+   * 没有它作者每次编辑都得重设一遍口令。
+   */
+  hasAccessPassword: boolean
   /** 当前用户是否为作者本人：可编辑资料、发布/编辑版本、删除。 */
   canManage: boolean
   /** 当前用户是否有审核权限。 */
@@ -106,11 +137,12 @@ export interface PluginVersion {
   reviewNote: string | null
   reviewedAt: string | null
   reviewedBy: string | null
-  pluginId: string
-  pluginName: string
-  pluginSlug: string
+  /** 所属资源的 Id（后台审核队列需要展示它属于谁）。 */
+  addonId: string
+  addonName: string
+  addonSlug: string
   /** 所属资源的类型，审核队列据此跳到插件或模组板块。 */
-  pluginKind: ResourceKind
+  addonKind: ResourceKind
   author: PluginAuthor
 }
 
@@ -231,7 +263,7 @@ export interface VoteState {
 
 export interface Comment {
   id: string
-  pluginId: string
+  addonId: string
   parentId: string | null
   body: string
   author: PluginAuthor
@@ -351,4 +383,43 @@ export interface UserCandidate {
   email: string | null
   avatar: string | null
   currentRole: AdminRole | null
+}
+
+/* ------------------------------------------------------------------ */
+/* 隐私访问                                                            */
+/* ------------------------------------------------------------------ */
+
+/**
+ * 口令解锁成功的凭据。`token` 明文只在这里出现一次 ——
+ * 服务端只存口令哈希，令牌本身是自签名的，丢了就重新输口令。
+ */
+export interface AccessUnlock {
+  success: boolean
+  /** 之后详情与下载请求带在 `X-Scforge-Access` 头里。 */
+  token: string
+  expiresAt: string
+  accessMode: AccessMode
+  notice: string
+}
+
+/** 白名单模式下的一名授权用户。 */
+export interface AccessGrant {
+  userId: string
+  username: string
+  createdAt: string
+}
+
+/** 一个可选择的访问方式（后端下发目录，前端不硬编码文案）。 */
+export interface AccessModeOption {
+  key: AccessMode
+  label: string
+  description: string
+}
+
+/** 白名单编辑器里「搜人」的结果项。 */
+export interface AccessCandidate {
+  userId: string
+  username: string
+  email: string | null
+  avatar: string | null
 }

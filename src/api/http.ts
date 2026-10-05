@@ -26,6 +26,8 @@ interface RequestOptions {
   form?: FormData
   query?: Record<string, string | number | boolean | undefined | null>
   signal?: AbortSignal
+  /** Extra request headers (e.g. the privacy unlock token). */
+  headers?: Record<string, string>
 }
 
 function buildUrl(path: string, query?: RequestOptions['query']): string {
@@ -63,7 +65,7 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
   const init: RequestInit = {
     method: options.method ?? 'GET',
     credentials: 'include',
-    headers: { Accept: 'application/json' },
+    headers: { Accept: 'application/json', ...options.headers },
     signal: options.signal,
   }
   if (options.form) {
@@ -83,19 +85,52 @@ async function request<T>(path: string, options: RequestOptions = {}): Promise<T
 }
 
 export const http = {
-  get: <T>(path: string, query?: RequestOptions['query'], signal?: AbortSignal) =>
-    request<T>(path, { query, signal }),
+  get: <T>(path: string, query?: RequestOptions['query'], signal?: AbortSignal, headers?: Record<string, string>) =>
+    request<T>(path, { query, signal, headers }),
   /** `query` 用于需要把参数放地址栏的 POST（如后台按 userId 签发）。 */
-  post: <T>(path: string, body?: unknown, query?: RequestOptions['query']) =>
-    request<T>(path, { method: 'POST', body, query }),
-  put: <T>(path: string, body?: unknown, query?: RequestOptions['query']) =>
-    request<T>(path, { method: 'PUT', body, query }),
-  patch: <T>(path: string, body?: unknown) => request<T>(path, { method: 'PATCH', body }),
-  del: <T>(path: string, body?: unknown, query?: RequestOptions['query']) =>
-    request<T>(path, { method: 'DELETE', body, query }),
+  post: <T>(path: string, body?: unknown, query?: RequestOptions['query'], headers?: Record<string, string>) =>
+    request<T>(path, { method: 'POST', body, query, headers }),
+  put: <T>(path: string, body?: unknown, query?: RequestOptions['query'], headers?: Record<string, string>) =>
+    request<T>(path, { method: 'PUT', body, query, headers }),
+  patch: <T>(path: string, body?: unknown, headers?: Record<string, string>) => request<T>(path, { method: 'PATCH', body, headers }),
+  del: <T>(path: string, body?: unknown, query?: RequestOptions['query'], headers?: Record<string, string>) =>
+    request<T>(path, { method: 'DELETE', body, query, headers }),
   /** multipart 上传；`method` 用于 PUT 形式的编辑端点（默认 POST）。 */
   upload: <T>(path: string, form: FormData, signal?: AbortSignal, method: string = 'POST') =>
     request<T>(path, { method, form, signal }),
+}
+
+/**
+ * 隐私插件的解锁令牌。
+ *
+ * 存在 sessionStorage 而非 localStorage：关掉标签页即失效，
+ * 共享电脑上下一个人不会自动继承访问权。令牌本身是自签名的短期凭据，
+ * 过期就重新输口令。
+ */
+const ACCESS_TOKEN_KEY = 'scforge.accessToken'
+
+export function getAccessToken(): string | null {
+  try {
+    return sessionStorage.getItem(ACCESS_TOKEN_KEY)
+  } catch {
+    // 隐私模式 / 存储被禁用：退化成每次都重新输口令，功能仍可用。
+    return null
+  }
+}
+
+export function setAccessToken(token: string | null): void {
+  try {
+    if (token) sessionStorage.setItem(ACCESS_TOKEN_KEY, token)
+    else sessionStorage.removeItem(ACCESS_TOKEN_KEY)
+  } catch {
+    /* 存储不可用时静默降级 */
+  }
+}
+
+/** 带解锁令牌的请求头；没有令牌时返回空对象，服务端按未解锁处理。 */
+export function accessHeaders(): Record<string, string> {
+  const token = getAccessToken()
+  return token ? { 'X-Scforge-Access': token } : {}
 }
 
 /** Absolute URL for an API-relative path (used by download links and images). */

@@ -6,6 +6,7 @@ import {
   IconComment,
   IconDownload,
   IconEdit,
+  IconLock,
   IconOpenInNew,
   IconPendingActions,
   IconStorage,
@@ -15,12 +16,13 @@ import { M3Button, M3Icon, M3IconButton, M3Tooltip } from '@/components/m3'
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'
-import { mineApi, pluginsApi } from '@/api/plugins'
+import { mineApi, isPrivacyPlugin, pluginsApi } from '@/api/plugins'
 import type { PluginSummary, UploadSummary } from '@/api/types'
 import { useAuth } from '@/composables/useAuth'
 import { useSnackbar } from '@/composables/useSnackbar'
 import { CATEGORY_LABELS, detailRoute, editRoute, KIND_LABELS } from '@/data/catalog'
 import { CONTENT_STATUS_LABELS } from '@/data/review'
+import { accessModeLabel } from '@/data/access'
 import { formatCount, formatRelative } from '@/utils/format'
 
 const router = useRouter()
@@ -112,6 +114,11 @@ onMounted(async () => {
                 {{ CONTENT_STATUS_LABELS[plugin.status] }}
               </span>
               <span class="md-tag md-tag--outlined">{{ CATEGORY_LABELS[plugin.category] ?? plugin.category }}</span>
+              <!-- 隐私插件不在公开目录里，作者只能从这里找入口，所以必须标出来。 -->
+              <span v-if="isPrivacyPlugin(plugin.accessMode)" class="md-tag md-tag--outlined sc-dash__lock">
+                <M3Icon :icon="IconLock" :size="14" />
+                {{ accessModeLabel(plugin.accessMode) }}
+              </span>
             </p>
             <p class="md-typescale-body-medium sc-muted sc-clamp-2">{{ plugin.summary }}</p>
             <p class="md-typescale-body-small sc-muted">
@@ -246,6 +253,12 @@ onMounted(async () => {
 .sc-dash__note {
   margin-block-start: 4px;
   color: var(--md-sys-color-error);
+}
+
+.sc-dash__lock {
+  display: inline-flex;
+  align-items: center;
+  gap: 3px;
 }
 
 .sc-dash__row-actions {
