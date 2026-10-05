@@ -11,6 +11,9 @@
 
 export interface ApiErrorBody {
   success?: boolean
+  /** ClouderyApi 统一错误体字段（所有错误响应，见 docs/API-ERROR-SHAPE.md）。 */
+  detail?: string
+  /** 旧字段：后端已不再下发，保留兜底。 */
   message?: string
 }
 
