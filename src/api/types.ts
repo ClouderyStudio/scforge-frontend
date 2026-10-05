@@ -109,11 +109,11 @@ export interface PluginVersion {
   reviewNote: string | null
   reviewedAt: string | null
   reviewedBy: string | null
-  pluginId: string
-  pluginName: string
-  pluginSlug: string
+  addonId: string
+  addonName: string
+  addonSlug: string
   /** 所属资源的类型，审核队列据此跳到插件或模组板块。 */
-  pluginKind: ResourceKind
+  addonKind: ResourceKind
   author: PluginAuthor
 }
 
@@ -234,7 +234,7 @@ export interface VoteState {
 
 export interface Comment {
   id: string
-  pluginId: string
+  addonId: string
   parentId: string | null
   body: string
   author: PluginAuthor
@@ -278,7 +278,7 @@ export interface CasdoorConfig {
 }
 
 export interface UploadSummary {
-  plugins: number
+  addons: number
   downloads: number
   upvotes: number
   comments: number
@@ -320,11 +320,11 @@ export interface AdminMe {
 }
 
 export interface AdminSummary {
-  pendingPlugins: number
+  pendingAddons: number
   pendingVersions: number
-  publishedPlugins: number
-  rejectedPlugins: number
-  totalPlugins: number
+  publishedAddons: number
+  rejectedAddons: number
+  totalAddons: number
   totalDownloads: number
   admins: number
 }

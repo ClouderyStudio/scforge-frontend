@@ -78,7 +78,7 @@ async function load(): Promise<void> {
   notFound.value = false
   try {
     const result = await pluginsApi.detail(slug.value)
-    plugin.value = result.plugin
+    plugin.value = result.addon
   } catch (error) {
     plugin.value = null
     if (error instanceof ApiError && error.status === 404) notFound.value = true
@@ -165,7 +165,7 @@ async function resubmit(): Promise<void> {
   resubmitting.value = true
   try {
     const result = await pluginsApi.resubmit(item.id)
-    plugin.value = result.plugin
+    plugin.value = result.addon
     snackbar.success('已重新提交，等待审核')
   } catch (error) {
     snackbar.error(error instanceof Error ? error.message : '提交失败')
@@ -365,7 +365,7 @@ onMounted(async () => {
           <!-- Comments -->
           <section v-else class="sc-detail__panel">
             <CommentThread
-              :plugin-id="plugin.id"
+              :addon-id="plugin.id"
               :comments="comments"
               :total="commentTotal"
               :loading="commentsLoading"

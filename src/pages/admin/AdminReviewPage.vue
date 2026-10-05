@@ -202,8 +202,8 @@ onMounted(load)
           <span class="sc-review__version-icon"><M3Icon :icon="IconStorage" :size="22" /></span>
           <div class="sc-review__main">
             <p class="md-typescale-title-medium">
-              {{ version.pluginName }} · {{ version.version }}
-              <span class="md-tag md-tag--outlined">{{ KIND_LABELS[version.pluginKind] }}</span>
+              {{ version.addonName }} · {{ version.version }}
+              <span class="md-tag md-tag--outlined">{{ KIND_LABELS[version.addonKind] }}</span>
               <span class="md-tag md-tag--outlined">{{ CHANNEL_LABELS[version.channel] ?? version.channel }}</span>
               <span class="md-tag" :class="`sc-status sc-status--${version.status}`">
                 {{ CONTENT_STATUS_LABELS[version.status] }}
@@ -225,7 +225,7 @@ onMounted(load)
                 :icon="IconOpenInNew"
                 label="打开插件详情"
                 variant="standard"
-                @click="router.push(detailRoute(version.pluginKind, version.pluginSlug))"
+                @click="router.push(detailRoute(version.addonKind, version.addonSlug))"
               />
             </M3Tooltip>
             <M3Button
@@ -234,7 +234,7 @@ onMounted(load)
               size="sm"
               :icon="IconCheckCircle"
               :disabled="busy === version.id"
-              @click="openReview('version', version.id, `${version.pluginName} ${version.version}`, true)"
+              @click="openReview('version', version.id, `${version.addonName} ${version.version}`, true)"
             >
               通过
             </M3Button>
@@ -243,7 +243,7 @@ onMounted(load)
               variant="text"
               size="sm"
               :disabled="busy === version.id"
-              @click="openReview('version', version.id, `${version.pluginName} ${version.version}`, false)"
+              @click="openReview('version', version.id, `${version.addonName} ${version.version}`, false)"
             >
               驳回
             </M3Button>

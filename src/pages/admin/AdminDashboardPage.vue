@@ -24,10 +24,10 @@ const summary = ref<AdminSummary | null>(null)
 const loading = ref(true)
 
 const cards = computed(() => [
-  { key: 'pendingPlugins', label: '待审核插件', value: summary.value?.pendingPlugins ?? 0, icon: IconPendingActions, to: 'admin-review' },
+  { key: 'pendingAddons', label: '待审核资源', value: summary.value?.pendingAddons ?? 0, icon: IconPendingActions, to: 'admin-review' },
   { key: 'pendingVersions', label: '待审核版本', value: summary.value?.pendingVersions ?? 0, icon: IconStorage, to: 'admin-review' },
-  { key: 'publishedPlugins', label: '已发布插件', value: summary.value?.publishedPlugins ?? 0, icon: IconTaskAlt, to: 'admin-plugins' },
-  { key: 'rejectedPlugins', label: '已驳回插件', value: summary.value?.rejectedPlugins ?? 0, icon: IconBlock, to: 'admin-plugins' },
+  { key: 'publishedAddons', label: '已发布资源', value: summary.value?.publishedAddons ?? 0, icon: IconTaskAlt, to: 'admin-plugins' },
+  { key: 'rejectedAddons', label: '已驳回资源', value: summary.value?.rejectedAddons ?? 0, icon: IconBlock, to: 'admin-plugins' },
   { key: 'totalDownloads', label: '累计下载', value: summary.value?.totalDownloads ?? 0, icon: IconDownload },
   { key: 'admins', label: '管理员', value: summary.value?.admins ?? 0, icon: IconGavel, to: 'admin-admins' },
 ])

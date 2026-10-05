@@ -99,7 +99,7 @@ async function submitReply(): Promise<void> {
   if (!body) return
   busy.value = true
   try {
-    await commentsApi.create(props.comment.pluginId, body, props.comment.id)
+    await commentsApi.create(props.comment.addonId, body, props.comment.id)
     replyBody.value = ''
     replyOpen.value = false
     snackbar.success('已回复')

@@ -37,15 +37,15 @@ export const adminApi = {
   summary: () => http.get<AdminSummary>('/scforge/admin/summary'),
 
   reviewPlugins: (query: AdminListQuery = {}) =>
-    http.get<AdminPluginPage>('/scforge/admin/review/plugins', { ...query } as Record<string, string | number>),
+    http.get<AdminPluginPage>('/scforge/admin/review/addons', { ...query } as Record<string, string | number>),
 
   reviewVersions: (query: AdminListQuery = {}) =>
     http.get<AdminVersionPage>('/scforge/admin/review/versions', { ...query } as Record<string, string | number>),
 
   /** 审核插件提交：通过 / 驳回（驳回必须给理由）。 */
-  reviewPlugin: (pluginId: string, body: ReviewBody) =>
-    http.post<{ success: boolean; plugin: PluginDetail }>(
-      `/scforge/admin/plugins/${encodeURIComponent(pluginId)}/review`,
+  reviewPlugin: (addonId: string, body: ReviewBody) =>
+    http.post<{ success: boolean; addon: PluginDetail }>(
+      `/scforge/admin/addons/${encodeURIComponent(addonId)}/review`,
       body,
     ),
 
@@ -57,18 +57,18 @@ export const adminApi = {
 
   /** 全量插件列表（含待审核与已驳回）。 */
   allPlugins: (query: AdminListQuery = {}) =>
-    http.get<AdminPluginPage>('/scforge/admin/plugins', { ...query } as Record<string, string | number>),
+    http.get<AdminPluginPage>('/scforge/admin/addons', { ...query } as Record<string, string | number>),
 
   /** 内容管理：编辑任意插件资料。 */
-  updatePlugin: (pluginId: string, form: FormData, signal?: AbortSignal) =>
-    http.upload<{ success: boolean; plugin: PluginDetail }>(
-      `/scforge/admin/plugins/${encodeURIComponent(pluginId)}`,
+  updatePlugin: (addonId: string, form: FormData, signal?: AbortSignal) =>
+    http.upload<{ success: boolean; addon: PluginDetail }>(
+      `/scforge/admin/addons/${encodeURIComponent(addonId)}`,
       form,
       signal,
       'PUT',
     ),
 
-  deletePlugin: (pluginId: string) => http.del<{ success: boolean }>(`/scforge/admin/plugins/${encodeURIComponent(pluginId)}`),
+  deletePlugin: (addonId: string) => http.del<{ success: boolean }>(`/scforge/admin/addons/${encodeURIComponent(addonId)}`),
 
   /* ---------------- 游戏版本（仅超管可写） ---------------- */
 

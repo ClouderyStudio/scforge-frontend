@@ -12,7 +12,7 @@ import type { Comment } from '@/api/types'
 import { useAuth } from '@/composables/useAuth'
 import { useSnackbar } from '@/composables/useSnackbar'
 
-const props = defineProps<{ pluginId: string; comments: Comment[]; total: number; loading: boolean }>()
+const props = defineProps<{ addonId: string; comments: Comment[]; total: number; loading: boolean }>()
 const emit = defineEmits<{ (e: 'refresh'): void }>()
 
 const router = useRouter()
@@ -41,7 +41,7 @@ async function submit(): Promise<void> {
   if (!text) return
   busy.value = true
   try {
-    await commentsApi.create(props.pluginId, text)
+    await commentsApi.create(props.addonId, text)
     body.value = ''
     snackbar.success('评论已发表')
     emit('refresh')

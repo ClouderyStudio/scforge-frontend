@@ -193,7 +193,7 @@ async function submit(): Promise<void> {
     } else {
       const result = await pluginsApi.create(buildForm())
       snackbar.success('已提交，等待管理员审核')
-      await router.push(detailRoute(result.plugin.kind, result.plugin.slug))
+      await router.push(detailRoute(result.addon.kind, result.addon.slug))
     }
   } catch (caught) {
     error.value = caught instanceof Error ? caught.message : '提交失败，请稍后重试'
@@ -208,16 +208,16 @@ onMounted(async () => {
   loadingTarget.value = true
   try {
     const result = await pluginsApi.detail(targetPluginId.value)
-    kind.value = result.plugin.kind
-    target.value = result.plugin
-    if (!result.plugin.canManage) {
+    kind.value = result.addon.kind
+    target.value = result.addon
+    if (!result.addon.canManage) {
       notAuthor.value = true
       error.value = '你不是该插件的作者，无法为它发布新版本（管理员也只能隐藏，不能代发版本）。'
       return
     }
-    form.value.category = result.plugin.category
-    form.value.gameVersion = result.plugin.gameVersion
-    gameVersions.value = [result.plugin.gameVersion]
+    form.value.category = result.addon.category
+    form.value.gameVersion = result.addon.gameVersion
+    gameVersions.value = [result.addon.gameVersion]
   } catch (caught) {
     error.value = caught instanceof Error ? caught.message : '无法加载目标插件'
   } finally {

@@ -124,12 +124,12 @@ async function load(): Promise<void> {
   denied.value = false
   try {
     const result = await pluginsApi.detail(slug.value)
-    plugin.value = result.plugin
-    if (!result.plugin.canManage && !result.plugin.canManageContent) {
+    plugin.value = result.addon
+    if (!result.addon.canManage && !result.addon.canManageContent) {
       denied.value = true
       return
     }
-    syncForm(result.plugin)
+    syncForm(result.addon)
   } catch (error) {
     denied.value = true
     snackbar.error(error instanceof Error ? error.message : '加载插件失败')
@@ -189,8 +189,8 @@ async function save(): Promise<void> {
   saving.value = true
   try {
     const result = await pluginsApi.update(item.id, data)
-    plugin.value = result.plugin
-    syncForm(result.plugin)
+    plugin.value = result.addon
+    syncForm(result.addon)
     icon.value = null
     gallery.value = []
     clearIcon.value = false
@@ -297,7 +297,7 @@ async function resubmitVersion(version: PluginVersion): Promise<void> {
 
 async function reloadVersions(focusId?: string): Promise<void> {
   const result = await pluginsApi.detail(slug.value)
-  plugin.value = result.plugin
+  plugin.value = result.addon
   void focusId
 }
 
