@@ -49,7 +49,7 @@ async function parseError(response: Response): Promise<never> {
     if (text) {
       try {
         const body = JSON.parse(text) as ApiErrorBody
-        if (body.message) message = body.message
+        if (body.detail || body.message) message = body.detail || body.message!
       } catch {
         if (text.length < 200) message = text
       }

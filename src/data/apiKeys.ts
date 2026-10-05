@@ -62,14 +62,14 @@ export function curlExample(apiKey: { token: string; scopes: ApiKeyScope[] }): s
   if (apiKey.scopes.includes('publish')) {
     return [
       `# 上传插件（包体走 multipart，其余字段与网页发布一致）`,
-      `curl -X POST "${base}/scforge/plugins" \\`,
+      `curl -X POST "${base}/scforge/addons" \\`,
       `  ${header} \\`,
       `  -F "package=@MyPlugin.dll" -F "version=1.0.0" -F "kind=plugin" …`,
     ].join('\n')
   }
   return [
     `# 查询我发布的资源`,
-    `curl "${base}/scforge/plugins/mine" \\`,
+    `curl "${base}/scforge/addons/mine" \\`,
     `  ${header}`,
   ].join('\n')
 }

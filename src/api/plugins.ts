@@ -58,26 +58,26 @@ export const pluginsApi = {
     http.upload<{ success: boolean; addon: PluginDetail }>('/scforge/addons', form, signal),
 
   /** 作者编辑插件资料（multipart）：编辑会重新进入待审核。 */
-  update: (pluginId: string, form: FormData, signal?: AbortSignal) =>
+  update: (addonId: string, form: FormData, signal?: AbortSignal) =>
     http.upload<{ success: boolean; addon: PluginDetail }>(
-      `/scforge/addons/${encodeURIComponent(pluginId)}`,
+      `/scforge/addons/${encodeURIComponent(addonId)}`,
       form,
       signal,
       'PUT',
     ),
 
   /** 把被驳回的插件重新提交审核。 */
-  resubmit: (pluginId: string) =>
-    http.post<{ success: boolean; addon: PluginDetail }>(`/scforge/addons/${encodeURIComponent(pluginId)}/resubmit`),
+  resubmit: (addonId: string) =>
+    http.post<{ success: boolean; addon: PluginDetail }>(`/scforge/addons/${encodeURIComponent(addonId)}/resubmit`),
 
-  remove: (pluginId: string) => http.del<{ success: boolean }>(`/scforge/addons/${encodeURIComponent(pluginId)}`),
+  remove: (addonId: string) => http.del<{ success: boolean }>(`/scforge/addons/${encodeURIComponent(addonId)}`),
 
   /* ---------------- 版本维护（作者） ---------------- */
 
   /** 追加版本：新版本进入待审核。 */
-  addVersion: (pluginId: string, form: FormData, signal?: AbortSignal) =>
+  addVersion: (addonId: string, form: FormData, signal?: AbortSignal) =>
     http.upload<{ success: boolean; version: PluginVersion }>(
-      `/scforge/addons/${encodeURIComponent(pluginId)}/versions`,
+      `/scforge/addons/${encodeURIComponent(addonId)}/versions`,
       form,
       signal,
     ),
@@ -109,14 +109,14 @@ export const votesApi = {
    * 幂等：重复点同一方向不会重复计数。
    * 隐私插件的投票也受访问控制约束，四个方法都带解锁令牌。
    */
-  up: (pluginId: string) =>
-    http.put<VoteState>(`/scforge/addons/${encodeURIComponent(pluginId)}/vote/up`, undefined, accessHeaders()),
-  down: (pluginId: string) =>
-    http.put<VoteState>(`/scforge/addons/${encodeURIComponent(pluginId)}/vote/down`, undefined, accessHeaders()),
-  clear: (pluginId: string) =>
-    http.del<VoteState>(`/scforge/addons/${encodeURIComponent(pluginId)}/vote`, accessHeaders()),
-  status: (pluginId: string) =>
-    http.get<VoteState>(`/scforge/addons/${encodeURIComponent(pluginId)}/vote`, undefined, undefined, accessHeaders()),
+  up: (addonId: string) =>
+    http.put<VoteState>(`/scforge/addons/${encodeURIComponent(addonId)}/vote/up`, undefined, accessHeaders()),
+  down: (addonId: string) =>
+    http.put<VoteState>(`/scforge/addons/${encodeURIComponent(addonId)}/vote/down`, undefined, accessHeaders()),
+  clear: (addonId: string) =>
+    http.del<VoteState>(`/scforge/addons/${encodeURIComponent(addonId)}/vote`, accessHeaders()),
+  status: (addonId: string) =>
+    http.get<VoteState>(`/scforge/addons/${encodeURIComponent(addonId)}/vote`, undefined, undefined, accessHeaders()),
 }
 
 export const commentsApi = {
@@ -124,17 +124,17 @@ export const commentsApi = {
    * 评论树。隐私插件的评论同样受访问控制约束，
    * 因此要带上解锁令牌（否则 403）—— 令牌由 http.ts 的 sessionStorage 托管。
    */
-  list: (pluginId: string, signal?: AbortSignal) =>
+  list: (addonId: string, signal?: AbortSignal) =>
     http.get<CommentList>(
-      `/scforge/addons/${encodeURIComponent(pluginId)}/comments`,
+      `/scforge/addons/${encodeURIComponent(addonId)}/comments`,
       undefined,
       signal,
       accessHeaders(),
     ),
 
-  create: (pluginId: string, body: string, parentId?: string | null) =>
+  create: (addonId: string, body: string, parentId?: string | null) =>
     http.post<{ success: boolean; comment: Comment }>(
-      `/scforge/addons/${encodeURIComponent(pluginId)}/comments`,
+      `/scforge/addons/${encodeURIComponent(addonId)}/comments`,
       { body, parentId: parentId ?? null },
       accessHeaders(),
     ),
@@ -167,12 +167,12 @@ export const accessApi = {
   modes: () => http.get<{ items: AccessModeOption[] }>('/scforge/addons/access/modes'),
 
   /** 提交口令换解锁令牌；令牌明文只在这次响应里出现。 */
-  unlock: (pluginId: string, password: string) =>
-    http.post<AccessUnlock>(`/scforge/addons/${encodeURIComponent(pluginId)}/access/unlock`, { password }),
+  unlock: (addonId: string, password: string) =>
+    http.post<AccessUnlock>(`/scforge/addons/${encodeURIComponent(addonId)}/access/unlock`, { password }),
 
   /** 读取白名单（作者或有内容管理权限的管理员）。 */
-  listGrants: (pluginId: string) =>
-    http.get<{ items: AccessGrant[] }>(`/scforge/addons/${encodeURIComponent(pluginId)}/access/grants`),
+  listGrants: (addonId: string) =>
+    http.get<{ items: AccessGrant[] }>(`/scforge/addons/${encodeURIComponent(addonId)}/access/grants`),
 
   /**
    * 搜人：按用户名 / 邮箱模糊匹配，供白名单编辑器挑选。
@@ -186,9 +186,9 @@ export const accessApi = {
     ),
 
   /** 整体替换白名单；传空数组即清空。 */
-  replaceGrants: (pluginId: string, userIds: string[]) =>
+  replaceGrants: (addonId: string, userIds: string[]) =>
     http.put<{ success: boolean; items: AccessGrant[] }>(
-      `/scforge/addons/${encodeURIComponent(pluginId)}/access/grants`,
+      `/scforge/addons/${encodeURIComponent(addonId)}/access/grants`,
       { userIds },
     ),
 }

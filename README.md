@@ -144,7 +144,7 @@ src/
   图标与截图只接受 JPG / PNG / WebP / GIF，**SVG 会被服务端拒绝**。
 - 插件包规范：`.zip` / `.scpkg` / `.dll`；zip 内根目录（或唯一一层子目录）可放 `manifest.json`
   （至少 `name` 与 `version`），用于补全表单里留空的名称与版本号。
-- 作者编辑资料用的是 `PUT /scforge/plugins/{id}`（multipart，可同时替换图标 / 截图）；
+- 作者编辑资料用的是 `PUT /scforge/addons/{id}`（multipart，可同时替换图标 / 截图）；
   传空字符串即清空对应链接，`clearIcon` / `clearGallery` 用于删除现有图片。
 - **权限**：改资料 / 发新版本 / 删除**只有作者本人**可以；管理员的能力由 `review` / `content` 权限码决定，
   超管额外能管理管理员。详情接口用 `canManage`、`canReview`、`canManageContent` 三个字段区分。

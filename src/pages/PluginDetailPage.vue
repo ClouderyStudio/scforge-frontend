@@ -416,7 +416,7 @@ onMounted(async () => {
           <!-- Comments -->
           <section v-else class="sc-detail__panel">
             <CommentThread
-              :plugin-id="plugin.id"
+              :addon-id="plugin.id"
               :comments="comments"
               :total="commentTotal"
               :loading="commentsLoading"

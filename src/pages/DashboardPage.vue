@@ -31,7 +31,7 @@ const snackbar = useSnackbar()
 
 const plugins = ref<PluginSummary[]>([])
 const summary = ref<UploadSummary>({
-  plugins: 0,
+  addons: 0,
   downloads: 0,
   upvotes: 0,
   comments: 0,
@@ -43,7 +43,7 @@ const loading = ref(true)
 const busy = ref<string | null>(null)
 
 const cards = computed(() => [
-  { key: 'plugins', label: '已提交插件', value: summary.value.plugins, icon: IconStorage },
+  { key: 'plugins', label: '已提交资源', value: summary.value.addons, icon: IconStorage },
   { key: 'pending', label: '待审核', value: summary.value.pending, icon: IconPendingActions },
   { key: 'published', label: '已发布', value: summary.value.published, icon: IconDownload },
   { key: 'downloads', label: '累计下载', value: summary.value.downloads, icon: IconThumbUp },

@@ -11,6 +11,9 @@
 
 export interface ApiErrorBody {
   success?: boolean
+  /** ClouderyApi 统一错误体字段（所有错误响应，见 docs/API-ERROR-SHAPE.md）。 */
+  detail?: string
+  /** 旧字段：后端已不再下发，保留兜底。 */
   message?: string
 }
 
@@ -137,7 +140,6 @@ export interface PluginVersion {
   reviewNote: string | null
   reviewedAt: string | null
   reviewedBy: string | null
-  /** 所属资源的 Id（后台审核队列需要展示它属于谁）。 */
   addonId: string
   addonName: string
   addonSlug: string
@@ -307,7 +309,7 @@ export interface CasdoorConfig {
 }
 
 export interface UploadSummary {
-  plugins: number
+  addons: number
   downloads: number
   upvotes: number
   comments: number
@@ -349,11 +351,11 @@ export interface AdminMe {
 }
 
 export interface AdminSummary {
-  pendingPlugins: number
+  pendingAddons: number
   pendingVersions: number
-  publishedPlugins: number
-  rejectedPlugins: number
-  totalPlugins: number
+  publishedAddons: number
+  rejectedAddons: number
+  totalAddons: number
   totalDownloads: number
   admins: number
 }
