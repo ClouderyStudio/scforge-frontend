@@ -56,6 +56,11 @@ export async function readAuthorPub(file: File): Promise<{ authorPublicKey: stri
   }
 }
 
+/** 从 netmod 里读任意条目的原始字节（网页打包用它取 modinfo.json）。 */
+export async function readNetmodEntry(file: File, name: string): Promise<Uint8Array<ArrayBuffer> | null> {
+  return extractZipEntry(file, name)
+}
+
 function toBase64(bytes: Uint8Array): string {
   let binary = ''
   for (const byte of bytes) binary += String.fromCharCode(byte)
