@@ -7,8 +7,8 @@
  * 网页自动把 secret.json 的 keyId/包名/版本/密钥、netmod 里 author.pub 的公钥与指纹
  * 填进表单，交给服务端信封加密落库 —— 之后客户端壳就能按 keyId 三元取到密钥。
  *
- * 「登记」同时承担轮换：换 keyId 再登记，旧的那把立刻作废（服务端规则，一个版本只留一把生效）。
- * 作废是失效关闭的 —— 立刻生效，之后壳再也取不到。
+ * 「登记」**不会碰任何已有密钥**：每个已发布版本的密钥继续生效，玩家手里的旧包不受影响。
+ * 作废是显式的管理动作 —— 只在列表里点「作废」，且立刻生效、不可通过重新登记恢复。
  */
 import { computed, onMounted, ref, watch } from 'vue'
 import { IconDelete, IconKey, IconShield, IconVerified, IconWarning } from '@/icons'
@@ -242,12 +242,13 @@ onMounted(() => void load())
       </div>
 
       <p class="md-typescale-body-small sc-muted">
-        换了 keyId 再登记＝轮换：旧的那把<strong>立刻作废</strong>（一个版本只留一把生效的密钥）。
+        登记<strong>不影响已有的其它密钥</strong> —— 每个已发布版本的密钥继续生效，玩家手里的旧包照常能用。
+        发新版本时用新 keyId 打包再登记即可；要停用某把密钥，在下方列表里显式作废。
       </p>
 
       <div>
         <M3Button variant="filled" :icon="IconVerified" :disabled="!canSubmit" @click="register">
-          {{ registering ? '登记中…' : '登记 / 轮换' }}
+          {{ registering ? '登记中…' : '登记密钥' }}
         </M3Button>
       </div>
     </section>
@@ -292,8 +293,8 @@ onMounted(() => void load())
     <!-- ---------------- 作废确认 ---------------- -->
     <M3Dialog v-model="confirmRevoke" title="作废这把加固密钥？">
       <template v-if="revokeTarget">
-        作废后<strong>立刻生效</strong>：客户端壳再也取不到这把密钥，用它的加固包会加载失败。
-        如果只是想换密钥（密钥本身没泄漏），推荐走「换 keyId 重新登记」，那样旧包还能用旧密钥平稳过渡。
+        作废后<strong>立刻生效且不可恢复</strong>：客户端壳再也取不到这把密钥，用它签的旧包会加载失败。
+        密钥泄漏就必须作废；如果只是要发新版本，<b>不需要动它</b> —— 直接用新 keyId 打包登记即可，旧包照常可用。
       </template>
       <template #actions>
         <M3Button variant="text" @click="revokeTarget = null">取消</M3Button>
