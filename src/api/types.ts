@@ -248,6 +248,25 @@ export interface ApiKeyIssued {
   notice: string
 }
 
+/**
+ * ModFortify 加固密钥的对外投影。
+ * **注意**：这里没有 AES 密钥本身 —— 服务端只存信封加密后的密文，取密钥是客户端壳的事；
+ * 界面能看到的是元信息，用于确认「哪一把在生效、旧的真的作废了没有」。
+ */
+export interface FortifyKeyRecord {
+  id: string
+  /** 32 位十六进制，壳按它（+ 包名 + 版本三元）来取密钥。 */
+  keyId: string
+  packageName: string
+  version: string
+  /** 公钥指纹（SHA-256(SPKI) 的十六进制），用来认「这是哪个作者的签名密钥」。 */
+  authorKeyFingerprint: string
+  /** 一律为北京时间（UTC+8），与 SCForge 其余 DTO 一致。 */
+  createdAt: string
+  revokedAt: string | null
+  active: boolean
+}
+
 /* ------------------------------------------------------------------ */
 /* 投票                                                                */
 /* ------------------------------------------------------------------ */

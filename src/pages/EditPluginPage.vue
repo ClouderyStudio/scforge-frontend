@@ -24,6 +24,7 @@ import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import ScMarkdownEditor from '@/components/markdown/ScMarkdownEditor.vue'
 import VersionList from '@/components/plugin/VersionList.vue'
+import FortifyPanel from '@/components/plugin/FortifyPanel.vue'
 import { pluginsApi, accessApi } from '@/api/plugins'
 import { useGameVersions } from '@/composables/useGameVersions'
 import type { AccessCandidate, AccessGrant, AccessMode, PluginDetail, PluginVersion, ReleaseChannel } from '@/api/types'
@@ -112,6 +113,7 @@ const confirmValue = computed({
 const tabs = [
   { value: 'meta', label: '插件资料' },
   { value: 'versions', label: '版本管理' },
+  { value: 'fortify', label: '加固' },
 ]
 
 const slug = computed(() => String(route.params.slug ?? ''))
@@ -688,7 +690,7 @@ onMounted(() => {
       </form>
 
       <!-- ---------------- 版本管理 ---------------- -->
-      <div v-else class="sc-edit__versions">
+      <div v-else-if="tab === 'versions'" class="sc-edit__versions">
         <section class="sc-form-card">
           <h2 class="sc-form-card__title md-typescale-title-medium">
             <M3Icon :icon="IconAdd" :size="20" />
@@ -848,6 +850,9 @@ onMounted(() => {
       </M3Dialog>
     </template>
   </div>
+
+  <!-- ---------------- 加固（ModFortify 密钥管理） ---------------- -->
+  <FortifyPanel v-if="tab === 'fortify' && plugin" :plugin="plugin" />
 </template>
 
 <style scoped>
