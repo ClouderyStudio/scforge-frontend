@@ -241,6 +241,71 @@ export async function packPayload(options: {
   }
 }
 
+/* ------------------------------- zip 读取器 ------------------------------- */
+
+/**
+ * 从（明文）netmod 字节里读指定 zip 条目；STORED 与 DEFLATE 都支持，找不到返回 null。
+ * 打包前的「已加固检测」与 modinfo 提取共用这一份。
+ */
+export async function readZipEntryBytes(plain: Uint8Array, name: string): Promise<Uint8Array<ArrayBuffer> | null> {
+  const view = new DataView(plain.buffer, plain.byteOffset, plain.byteLength)
+  const eocd = findEocd(view)
+  if (!eocd) return null
+  let offset = eocd.entryOffset
+  for (let i = 0; i < eocd.entryCount; i++) {
+    if (view.getUint32(offset, true) !== 0x0201_4b50) throw new Error('zip 中央目录损坏')
+    const method = view.getUint16(offset + 10, true)
+    const compressedSize = view.getUint32(offset + 20, true)
+    const nameLength = view.getUint16(offset + 28, true)
+    const extraLength = view.getUint16(offset + 30, true)
+    const commentLength = view.getUint16(offset + 32, true)
+    const localOffset = view.getUint32(offset + 42, true)
+    const entryName = new TextDecoder().decode(
+      new Uint8Array(plain.buffer, plain.byteOffset + offset + 46, nameLength),
+    )
+    if (entryName === name) {
+      const abs = plain.byteOffset + localOffset
+      if (view.getUint32(abs, true) !== 0x0403_4b50) throw new Error('zip 本地头损坏')
+      const localNameLength = view.getUint16(abs + 26, true)
+      const localExtraLength = view.getUint16(abs + 28, true)
+      const dataStart = abs + 30 + localNameLength + localExtraLength
+      const raw = new Uint8Array(view.buffer, dataStart, compressedSize)
+      if (method === 0) return raw.slice()
+      if (method !== 8) throw new Error(`不支持的 zip 压缩方式（${method}）`)
+      const stream = new Blob([raw.slice() as BlobPart]).stream().pipeThrough(new DecompressionStream('deflate-raw'))
+      return new Uint8Array(await new Response(stream).arrayBuffer())
+    }
+    offset += 46 + nameLength + extraLength + commentLength
+  }
+  return null
+}
+
+function findEocd(view: DataView): { entryCount: number; entryOffset: number } | null {
+  // EOCD 最短 22 字节，注释最长 65535 —— 从文件尾部往回扫这一段。
+  const start = Math.max(0, view.byteLength - 22 - 65_535)
+  for (let i = view.byteLength - 22; i >= start; i--) {
+    if (view.getUint32(i, true) !== 0x0605_4b50) continue
+    const entryCount = view.getUint16(i + 10, true)
+    const entryOffset = view.getUint32(i + 16, true)
+    if (entryOffset + 22 <= view.byteLength) return { entryCount, entryOffset }
+  }
+  return null
+}
+
+/**
+ * 判断一段明文是不是**已经是 ModFortify 加固包**（payload.bin 以 MFORT 魔数开头）。
+ * 打包入口用它拒绝二次加固：对加固包再套壳会让两层壳同时剥开，
+ * 且攻击者可以借嵌套把别人的加固包套上自己的签名身份（洗白作者）。
+ */
+export async function looksLikeFortified(plain: Uint8Array): Promise<boolean> {
+  const payload = await readZipEntryBytes(plain, 'payload.bin')
+  if (!payload || payload.length < MAGIC.length) return false
+  for (let i = 0; i < MAGIC.length; i++) {
+    if (payload[i] !== MAGIC.charCodeAt(i)) return false
+  }
+  return true
+}
+
 /* ------------------------------- zip 写入器 ------------------------------- */
 
 let crcTable: number[] | null = null
@@ -344,6 +409,11 @@ export interface WebPackOutput {
 
 /** 一步到位：明文 netmod → 加固 netmod + 登记所需的全部字段。 */
 export async function packNetmod(input: WebPackInput): Promise<WebPackOutput> {
+  // 核心层的二次加固拒绝：UI 会在拖入时友好提示，但真正的闸门在这里 ——
+  // 任何调用方（包括未来新写的界面）都绕不过去。
+  if (await looksLikeFortified(input.plain)) {
+    throw new Error('这个包已经是加固包，不能再次加固 —— 请用原始未加固的 netmod')
+  }
   const aesKey = randomBytes(KEY_LEN)
   const keyId = randomBytes(KEY_ID_LEN)
 

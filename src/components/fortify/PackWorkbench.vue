@@ -22,9 +22,11 @@ import {
   FORTIFY_SERVICE_HOST,
   generateAuthorKey,
   importAuthorKeyPkcs8,
+  looksLikeFortified,
   packNetmod,
   pemToDer,
   pkcs8ToPem,
+  readZipEntryBytes,
   spkiToPem,
 } from '@/utils/mfortifyPack'
 
@@ -53,7 +55,13 @@ watch(plainFile, async (file) => {
   if (!file) return
   try {
     const bytes = new Uint8Array(await file.arrayBuffer())
-    const modinfo = await readModinfo(bytes, file)
+    // 先拒绝二次加固：对加固包再套壳会让两层壳同时剥开（密钥登记翻倍），
+    // 且攻击者可借嵌套把别人的加固包套上自己的签名身份（洗白作者）。
+    if (await looksLikeFortified(bytes)) {
+      throw new Error('这个包已经是加固包，不能再次加固 —— 请用原始未加固的 netmod')
+    }
+    const modinfo = await readZipEntryBytes(bytes, 'modinfo.json')
+    if (!modinfo) throw new Error(`${file.name} 里没有 modinfo.json —— 它应该是一个原始的 netmod`)
     const text = decodeUtf8(modinfo)
     const parsed = JSON.parse(text) as { PackageName?: string; Version?: string }
     if (!parsed.PackageName) throw new Error('modinfo.json 里没有 PackageName')
@@ -66,60 +74,6 @@ watch(plainFile, async (file) => {
     snackbar.error(error instanceof Error ? error.message : String(error))
   }
 })
-
-/** 从明文字节里解出 zip 的 modinfo.json 条目（STORED 与 DEFLATE 都支持）。 */
-async function readModinfo(plain: Uint8Array, file: File): Promise<Uint8Array<ArrayBuffer>> {
-  // 复用全局的解压能力：这里内联一个最小读取器，避免依赖 File 对象。
-  const view = new DataView(plain.buffer, plain.byteOffset, plain.byteLength)
-  const eocd = findEocd(view)
-  if (!eocd) throw new Error(`${file.name} 不是合法的 zip`)
-  let offset = eocd.entryOffset
-  for (let i = 0; i < eocd.entryCount; i++) {
-    if (view.getUint32(offset, true) !== 0x0201_4b50) throw new Error(`${file.name} 的中央目录损坏`)
-    const method = view.getUint16(offset + 10, true)
-    const compressedSize = view.getUint32(offset + 20, true)
-    const nameLength = view.getUint16(offset + 28, true)
-    const extraLength = view.getUint16(offset + 30, true)
-    const commentLength = view.getUint16(offset + 32, true)
-    const localOffset = view.getUint32(offset + 42, true)
-    const name = new TextDecoder().decode(new Uint8Array(plain.buffer, plain.byteOffset + offset + 46, nameLength))
-    if (name === 'modinfo.json') {
-      return await readEntry(view, plain.byteOffset, localOffset, method, compressedSize)
-    }
-    offset += 46 + nameLength + extraLength + commentLength
-  }
-  throw new Error(`${file.name} 里没有 modinfo.json —— 它应该是一个原始的 netmod`)
-}
-
-function findEocd(view: DataView): { entryCount: number; entryOffset: number } | null {
-  const start = Math.max(0, view.byteLength - 22 - 65_535)
-  for (let i = view.byteLength - 22; i >= start; i--) {
-    if (view.getUint32(i, true) !== 0x0605_4b50) continue
-    const entryCount = view.getUint16(i + 10, true)
-    const entryOffset = view.getUint32(i + 16, true)
-    if (entryOffset + 22 <= view.byteLength) return { entryCount, entryOffset }
-  }
-  return null
-}
-
-async function readEntry(
-  view: DataView,
-  baseOffset: number,
-  localOffset: number,
-  method: number,
-  compressedSize: number,
-): Promise<Uint8Array<ArrayBuffer>> {
-  const abs = baseOffset + localOffset
-  if (view.getUint32(abs, true) !== 0x0403_4b50) throw new Error('zip 本地头损坏')
-  const nameLength = view.getUint16(abs + 26, true)
-  const extraLength = view.getUint16(abs + 28, true)
-  const dataStart = abs + 30 + nameLength + extraLength
-  const raw = new Uint8Array(view.buffer, dataStart, compressedSize)
-  if (method === 0) return raw.slice()
-  if (method !== 8) throw new Error(`不支持的 zip 压缩方式（${method}）`)
-  const stream = new Blob([raw.slice() as BlobPart]).stream().pipeThrough(new DecompressionStream('deflate-raw'))
-  return new Uint8Array(await new Response(stream).arrayBuffer())
-}
 
 function decodeUtf8(b: Uint8Array): string {
   const off = b.length >= 3 && b[0] === 0xef && b[1] === 0xbb && b[2] === 0xbf ? 3 : 0
