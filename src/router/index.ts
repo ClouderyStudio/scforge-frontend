@@ -39,6 +39,13 @@ const routes: RouteRecordRaw[] = [
     meta: { kind: 'mod', title: '编辑模组', requiresAuth: true },
   },
   {
+    // 加固工作台：不挂在某个资源下 —— 选资源 + 打包 + 登记，一条龙。
+    path: '/fortify',
+    name: 'fortify',
+    component: () => import('@/pages/FortifyPage.vue'),
+    meta: { title: '加固工作台', requiresAuth: true },
+  },
+  {
     path: '/plugins/:slug',
     name: 'plugin-detail',
     component: () => import('@/pages/PluginDetailPage.vue'),

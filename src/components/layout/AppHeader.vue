@@ -13,6 +13,7 @@ import {
   IconMenu,
   IconPerson,
   IconSearch,
+  IconShield,
   IconTune,
   IconUpload,
   IconDeployedCode,
@@ -199,6 +200,7 @@ async function signOut(): Promise<void> {
           </div>
           <M3MenuItem :icon="IconPerson" label="我的插件" @click="router.push({ name: 'dashboard' })" />
           <M3MenuItem :icon="IconKey" label="API 密钥" @click="router.push({ name: 'api-keys' })" />
+          <M3MenuItem :icon="IconShield" label="模组加固" @click="router.push({ name: 'fortify' })" />
           <M3MenuItem :icon="IconUpload" label="发布新插件" @click="router.push({ name: 'upload' })" />
           <M3MenuItem
             v-if="isAdmin"
@@ -274,6 +276,15 @@ async function signOut(): Promise<void> {
       >
         <M3Icon :icon="IconKey" :size="20" />
         API 密钥
+      </RouterLink>
+      <RouterLink
+        v-if="isAuthenticated"
+        class="sc-drawer__link md-typescale-body-large"
+        :to="{ name: 'fortify' }"
+        @click="drawerOpen = false"
+      >
+        <M3Icon :icon="IconShield" :size="20" />
+        模组加固
       </RouterLink>
       <RouterLink
         v-else
