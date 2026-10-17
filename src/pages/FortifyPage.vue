@@ -13,6 +13,7 @@ import {
   IconBlock,
   IconInfo,
   IconKey,
+  IconScience,
   IconShield,
   IconVerified,
   IconWarning,
@@ -120,6 +121,66 @@ function goUpload(): void {
         </div>
       </div>
     </section>
+
+    <!-- 原理介绍：默认折叠，想深究的作者点开看 -->
+    <details class="sc-fcard sc-fortify-page__how">
+      <summary class="sc-fcard__title md-typescale-title-medium">
+        <M3Icon :icon="IconScience" :size="20" />
+        原理：它是怎么工作的？破解有多难？
+      </summary>
+
+      <ol class="sc-fortify-page__steps md-typescale-body-medium">
+        <li>
+          <strong>打包（在你的浏览器里）</strong> ——
+          先生成一把一次性的「内容密钥」，把整个 mod 锁进保险箱（AES-256-GCM 加密）；
+          再用你的「签名私钥」给包裹盖上<strong>防伪章</strong>（ECDSA 签名）——
+          包名、版本号一起盖进章里，事后改不掉。
+        </li>
+        <li>
+          <strong>登记（发给 scforge 服务器）</strong> ——
+          内容密钥本身再被服务器的主密钥<strong>包一层</strong>（信封加密）后存进服务器；
+          加固包里只留一个「取件编号」（keyId）。密钥从不以明文出现在包里。
+        </li>
+        <li>
+          <strong>加载（玩家的游戏里）</strong> ——
+          壳先验防伪章（签名 + 整个 modinfo 的指纹比对），章完好才拿编号联网取密钥，
+          在内存里解开后才交给游戏。任何一步对不上 → 直接拒绝加载。
+        </li>
+      </ol>
+
+      <h3 class="md-typescale-title-small sc-fortify-page__how-sub">想破解？每一关都是硬骨头</h3>
+      <ul class="md-typescale-body-medium sc-fortify-page__cracks">
+        <li>
+          <strong>暴力试密钥 —— 试不动。</strong>
+          AES-256 有 2 的 256 次方种密钥，把全世界的电脑都开动，算到宇宙热寂也试不完。
+        </li>
+        <li>
+          <strong>改包绕过验签 —— 盖不出章。</strong>
+          没有私钥就造不出合法签名；改一个字节、哪怕只改包名版本号，验签当场识破。
+        </li>
+        <li>
+          <strong>把壳抠掉直接跑 —— 没钥匙开门。</strong>
+          密钥根本不在包里，包里只有编号；拿不到密钥，剩下的密文就是一堆乱码。
+        </li>
+        <li>
+          <strong>偷服务器数据库 —— 偷到的还是密文。</strong>
+          密钥在库里是信封加密存的，主密钥另存；光拖库拿不到任何一把明文密钥。
+        </li>
+        <li>
+          <strong>自建假服务器骗密钥 —— 地址改不了。</strong>
+          取密钥的服务器地址钉死在包里、且被签名覆盖，改地址 = 先毁自己的章。
+        </li>
+        <li>
+          <strong>内存转储（dump）—— 现实中唯一的口子。</strong>
+          mod 载入内存的那一刻总有明文，挡不住专业逆向。如实说：本工具防的是
+          「二改与白嫖」，不承诺对抗内存级攻击。
+        </li>
+        <li>
+          <strong>管理兜底 —— 技术之外还有制度。</strong>
+          就算有人绕过以上全部，管理方复核后仍可查看登记密钥的明文，直接开箱检查包内容。
+        </li>
+      </ul>
+    </details>
 
     <LoadingSkeleton v-if="loading" />
 
@@ -240,6 +301,61 @@ function goUpload(): void {
   border-radius: var(--md-sys-shape-corner-small);
   background-color: var(--md-sys-color-surface-container-highest);
   font-size: 0.9em;
+}
+
+/* 原理介绍（details 折叠卡） */
+.sc-fortify-page__how summary {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+  user-select: none;
+  list-style: none;
+}
+
+.sc-fortify-page__how summary::-webkit-details-marker {
+  display: none;
+}
+
+.sc-fortify-page__how summary::after {
+  content: '展开 ▾';
+  margin-inline-start: auto;
+  color: var(--md-sys-color-primary);
+  font-size: var(--md-typescale-label-large-size);
+}
+
+.sc-fortify-page__how[open] summary::after {
+  content: '收起 ▴';
+}
+
+.sc-fortify-page__steps {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding-inline-start: 20px;
+}
+
+.sc-fortify-page__steps li::marker {
+  color: var(--md-sys-color-primary);
+  font-weight: var(--md-typescale-title-small-weight);
+}
+
+.sc-fortify-page__how-sub {
+  margin-block-start: 4px;
+  font-weight: var(--md-typescale-title-small-weight);
+}
+
+.sc-fortify-page__cracks {
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  margin: 0;
+  padding-inline-start: 20px;
+}
+
+.sc-fortify-page__cracks li::marker {
+  color: var(--md-sys-color-primary);
 }
 
 .sc-fortify-page__field {
