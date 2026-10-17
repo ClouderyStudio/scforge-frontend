@@ -16,6 +16,7 @@ import type {
   PluginDetail,
   PluginVersion,
   UserCandidate,
+  FortifyKeyRecord,
 } from './types'
 
 export interface ReviewBody {
@@ -89,4 +90,29 @@ export const adminApi = {
     http.post<{ success: boolean; admin: AdminRecord }>('/scforge/admin/admins', body),
 
   deleteAdmin: (id: string) => http.del<{ success: boolean }>(`/scforge/admin/admins/${encodeURIComponent(id)}`),
+}
+
+/* ---------------- ModFortify 加固密钥（仅超管） ---------------- */
+
+/**
+ * 加固密钥巡检与**查看明文**。
+ *
+ * 查看是反制「外挂用加固工具上锁」的手段：拿到密钥就能解包分析。
+ * 三道闸门都在服务端：超管身份、独立查看密码（Scforge:Fortify:RevealPassword，
+ * 只存在服务器配置里，与账号体系无关）、审计日志；接口另有限流（5 次 / 5 分钟）。
+ */
+export const fortifyAdminApi = {
+  /** 全站加固密钥列表（只有元信息，永远不含密钥本身）。 */
+  list: () => http.get<{ items: FortifyKeyRecord[] }>('/scforge/admin/fortify/keys'),
+
+  /** 查看一把密钥的明文 AES 密钥（高危动作，服务端有审计日志）。 */
+  reveal: (id: string, password: string) =>
+    http.post<{
+      success: boolean
+      keyId: string
+      packageName: string
+      version: string
+      authorKeyFingerprint: string
+      key: string
+    }>(`/scforge/admin/fortify/keys/${encodeURIComponent(id)}/reveal`, { password }),
 }

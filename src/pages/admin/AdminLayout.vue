@@ -10,6 +10,7 @@ import {
   IconKey,
   IconPendingActions,
   IconSchedule,
+  IconShield,
   IconStorage,
 } from '@/icons'
 import { M3Icon } from '@/components/m3'
@@ -26,6 +27,7 @@ const items = computed(() =>
     { name: 'admin-game-versions', label: '游戏版本', icon: IconSchedule, show: isSuperAdmin.value },
     { name: 'admin-admins', label: '管理员', icon: IconGavel, show: isSuperAdmin.value },
     { name: 'admin-api-keys', label: 'API 密钥', icon: IconKey, show: isSuperAdmin.value },
+    { name: 'admin-fortify', label: '加固密钥', icon: IconShield, show: isSuperAdmin.value },
   ].filter((item) => item.show),
 )
 

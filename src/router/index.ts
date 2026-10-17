@@ -119,6 +119,12 @@ const routes: RouteRecordRaw[] = [
         component: () => import('@/pages/admin/AdminApiKeysPage.vue'),
         meta: { title: 'API 密钥' },
       },
+        {
+          path: 'fortify',
+          name: 'admin-fortify',
+          component: () => import('@/pages/admin/AdminFortifyPage.vue'),
+          meta: { title: '加固密钥', requiresAuth: true },
+        },
     ],
   },
   {
