@@ -110,11 +110,13 @@ export async function generateAuthorKey(): Promise<AuthorKey> {
 
 /** 导入 PKCS#8 DER 私钥（作者拖入 CLI 生成的 .key.pem 时走这里）。 */
 export async function importAuthorKeyPkcs8(der: Uint8Array<ArrayBuffer>): Promise<AuthorKey> {
+  // extractable 必须为 true：下面要从私钥推导出公钥（exportKey jwk）。
+  // 这里"可导出"不构成额外泄露 —— 私钥本来就完整存在于作者的 .key.pem 文件里。
   const privateKey = await crypto.subtle.importKey(
     'pkcs8',
     der as BufferSource,
     { name: 'ECDSA', namedCurve: 'P-256' },
-    false,
+    true,
     ['sign'],
   )
   // 公钥从私钥推导：临时再导入成可导出句柄拿 SPKI。
