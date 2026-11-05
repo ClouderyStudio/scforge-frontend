@@ -9,7 +9,7 @@ import {
   IconStorage,
   IconTaskAlt,
 } from '@/icons'
-import { M3Button, M3Icon } from '@/components/m3'
+import { M3Button, M3Icon } from '@clderystd/m3-ui'
 import { adminApi } from '@/api/admin'
 import type { AdminSummary } from '@/api/types'
 import { useAdmin } from '@/composables/useAdmin'

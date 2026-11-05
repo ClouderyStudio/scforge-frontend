@@ -8,7 +8,7 @@
  */
 import { computed, onMounted, ref } from 'vue'
 import { IconAutorenew, IconBlock, IconKey, IconPersonAdd, IconSearch, IconWarning } from '@/icons'
-import { M3Button, M3Dialog, M3Icon, M3IconButton, M3Tooltip } from '@/components/m3'
+import { M3Button, M3Dialog, M3Icon, M3IconButton, M3Tooltip } from '@clderystd/m3-ui'
 import ApiKeyTokenDialog from '@/components/apikey/ApiKeyTokenDialog.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'

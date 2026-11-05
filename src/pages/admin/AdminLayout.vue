@@ -13,7 +13,7 @@ import {
   IconShield,
   IconStorage,
 } from '@/icons'
-import { M3Icon } from '@/components/m3'
+import { M3Icon } from '@clderystd/m3-ui'
 import { useAdmin } from '@/composables/useAdmin'
 
 const route = useRoute()

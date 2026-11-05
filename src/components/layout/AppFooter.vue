@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IconGithub, IconMail, IconMenuBook, IconPublic, IconSportsEsports } from '@/icons'
-import { M3Icon, M3IconButton } from '@/components/m3'
+import { M3Icon, M3IconButton } from '@clderystd/m3-ui'
 import { copyrightNotice, studio } from '@/data/brand'
 
 const copyright = copyrightNotice()

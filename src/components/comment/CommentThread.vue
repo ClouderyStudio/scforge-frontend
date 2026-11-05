@@ -2,7 +2,7 @@
 import { computed, ref } from 'vue'
 import { useRouter } from 'vue-router'
 import { IconComment, IconLogin, IconSort } from '@/icons'
-import { M3Button, M3Icon, M3Menu, M3MenuItem } from '@/components/m3'
+import { M3Button, M3Icon, M3Menu, M3MenuItem } from '@clderystd/m3-ui'
 import CommentEditor from './CommentEditor.vue'
 import CommentItem from './CommentItem.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'

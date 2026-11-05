@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import type { IconComponent } from '@/icons'
-import { M3Icon } from '@/components/m3'
+import { M3Icon } from '@clderystd/m3-ui'
 
 withDefaults(
   defineProps<{

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { IconCheckCircle, IconClose, IconWarning } from '@/icons'
-import { M3Icon, M3IconButton } from '@/components/m3'
+import { M3Icon, M3IconButton } from '@clderystd/m3-ui'
 import { useSnackbar } from '@/composables/useSnackbar'
 
 const { message, hide } = useSnackbar()

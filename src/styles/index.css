@@ -1,7 +1,12 @@
 /* Material Design 3 stylesheet entry. Order matters. */
+
+/* 组件库：结构令牌 + 组件样式（不含配色） */
+@import '@clderystd/m3-ui/style.css';
+
 @import '@fontsource-variable/roboto-flex';
+
+/* 本站配色：橙色种子 #E85D04，由本仓库自己生成 */
 @import './m3-color-tokens.css';
-@import './m3-foundations.css';
-@import './base.css';
-@import './motion.css';
+
+/* 本站独有的样式 */
 @import './scforge.css';

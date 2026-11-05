@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { IconDownload, IconExpandLess, IconExpandMore, IconFolderZip, IconPublic, IconSchedule, IconVerified } from '@/icons'
-import { M3Button, M3Icon } from '@/components/m3'
+import { M3Button, M3Icon } from '@clderystd/m3-ui'
 import ScMarkdown from '@/components/markdown/ScMarkdown.vue'
 import type { PluginVersion } from '@/api/types'
 import { CHANNEL_LABELS, isModPackage } from '@/data/catalog'

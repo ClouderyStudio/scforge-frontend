@@ -7,7 +7,7 @@
  */
 import { computed, onMounted, ref } from 'vue'
 import { IconAdd, IconDelete, IconSchedule } from '@/icons'
-import { M3Button, M3Icon, M3IconButton, M3Tooltip } from '@/components/m3'
+import { M3Button, M3Icon, M3IconButton, M3Tooltip } from '@clderystd/m3-ui'
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import { adminApi } from '@/api/admin'

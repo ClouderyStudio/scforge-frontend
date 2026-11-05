@@ -15,7 +15,7 @@ import {
   IconThumbUp,
   IconVerified,
 } from '@/icons'
-import { M3Button, M3Icon } from '@/components/m3'
+import { M3Button, M3Icon } from '@clderystd/m3-ui'
 import PluginGrid from '@/components/plugin/PluginGrid.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'

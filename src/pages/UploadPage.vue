@@ -13,7 +13,7 @@ import {
   IconTag,
   IconTune,
 } from '@/icons'
-import { M3Button, M3Chip, M3Icon, M3SegmentedButton, M3Tooltip } from '@/components/m3'
+import { M3Button, M3Chip, M3Icon, M3SegmentedButton, M3Tooltip } from '@clderystd/m3-ui'
 import FileDrop from '@/components/ui/FileDrop.vue'
 import ScMarkdownEditor from '@/components/markdown/ScMarkdownEditor.vue'
 import { pluginsApi } from '@/api/plugins'

@@ -6,7 +6,7 @@
  * 与作者发布/编辑插件时写的 README 是同一套语法，所见即所得地在预览里确认。
  */
 import { computed, nextTick, ref, watch } from 'vue'
-import { M3Button, M3IconButton, M3Tooltip } from '@/components/m3'
+import { M3Button, M3IconButton, M3Tooltip } from '@clderystd/m3-ui'
 import ScMarkdown from './ScMarkdown.vue'
 import {
   IconCode,

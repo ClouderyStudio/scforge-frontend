@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import { IconDelete, IconGavel, IconPersonAdd, IconSearch, IconShieldPerson } from '@/icons'
-import { M3Button, M3Dialog, M3Icon, M3IconButton, M3Tooltip } from '@/components/m3'
+import { M3Button, M3Dialog, M3Icon, M3IconButton, M3Tooltip } from '@clderystd/m3-ui'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'
 import { adminApi } from '@/api/admin'

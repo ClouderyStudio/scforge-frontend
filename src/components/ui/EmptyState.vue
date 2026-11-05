@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { M3Button, M3Icon } from '@/components/m3'
+import { M3Button, M3Icon } from '@clderystd/m3-ui'
 import { IconSearch, type IconComponent } from '@/icons'
 
 withDefaults(

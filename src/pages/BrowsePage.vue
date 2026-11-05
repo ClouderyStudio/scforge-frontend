@@ -2,7 +2,7 @@
 import { computed, onMounted, ref, watch } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { IconClose, IconDeployedCode, IconFilterList, IconInventory2, IconRefresh, IconSearch, IconSort, IconTune } from '@/icons'
-import { M3Button, M3Icon, M3IconButton, M3Menu, M3MenuItem, M3SegmentedButton, M3Sheet, M3Tooltip } from '@/components/m3'
+import { M3Button, M3Icon, M3IconButton, M3Menu, M3MenuItem, M3SegmentedButton, M3Sheet, M3Tooltip } from '@clderystd/m3-ui'
 import PluginGrid from '@/components/plugin/PluginGrid.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'

@@ -8,6 +8,9 @@ importers:
 
   .:
     dependencies:
+      '@clderystd/m3-ui':
+        specifier: 0.1.0
+        version: 0.1.0(vue@3.5.43(typescript@6.0.3))
       dompurify:
         specifier: ^3.4.16
         version: 3.4.16
@@ -79,6 +82,11 @@ packages:
   '@babel/types@7.29.8':
     resolution: {integrity: sha512-Vj1jF3cPfxg7OAfoI7QnVKLoILlm2JF9pnVHrX8qx7AHMiYWT+NDAA7jChlNgRS4WTLc/fD1lXLmPixluj+3Gg==}
     engines: {node: '>=6.9.0'}
+
+  '@clderystd/m3-ui@0.1.0':
+    resolution: {integrity: sha512-C/kb34Gkc4R6zAPE/jl6riFEGetTz0QGvydNcgIy4H/ShwEo5Z8A29AmKyLGAD9wEDeS16M1YnZFcH4/N6tIMQ==}
+    peerDependencies:
+      vue: ^3.5.0
 
   '@fontsource-variable/roboto-flex@5.3.0':
     resolution: {integrity: sha512-bOxckUy0qXNRjhV6e4pcHGSvptix4ZRD1uaj5Za8h+p3qrb2GL4U4TQdpVmPSy0SmqwldfD+JJqEKdF68EyiAw==}
@@ -644,6 +652,10 @@ snapshots:
     dependencies:
       '@babel/helper-string-parser': 7.29.7
       '@babel/helper-validator-identifier': 7.29.7
+
+  '@clderystd/m3-ui@0.1.0(vue@3.5.43(typescript@6.0.3))':
+    dependencies:
+      vue: 3.5.43(typescript@6.0.3)
 
   '@fontsource-variable/roboto-flex@5.3.0': {}
 

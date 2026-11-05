@@ -27,7 +27,7 @@ import {
   M3MenuItem,
   M3Sheet,
   M3Tooltip,
-} from '@/components/m3'
+} from '@clderystd/m3-ui'
 import { useAuth } from '@/composables/useAuth'
 import { useAdmin } from '@/composables/useAdmin'
 import { studio } from '@/data/brand'

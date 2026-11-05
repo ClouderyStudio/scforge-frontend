@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { IconDownload, IconRefresh, IconTag, IconThumbUp, IconVerified } from '@/icons'
-import { M3Icon } from '@/components/m3'
+import { M3Icon } from '@clderystd/m3-ui'
 import PluginIcon from './PluginIcon.vue'
 import type { PluginSummary } from '@/api/types'
 import { CATEGORY_LABELS, TAG_LABELS, detailRoute } from '@/data/catalog'

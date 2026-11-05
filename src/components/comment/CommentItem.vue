@@ -8,7 +8,7 @@
  */
 import { computed, ref } from 'vue'
 import { IconDelete, IconEdit, IconReply, IconReport } from '@/icons'
-import { M3Avatar, M3Button, M3Dialog, M3IconButton, M3Tooltip } from '@/components/m3'
+import { M3Avatar, M3Button, M3Dialog, M3IconButton, M3Tooltip } from '@clderystd/m3-ui'
 import ScMarkdown from '@/components/markdown/ScMarkdown.vue'
 import ScMarkdownEditor from '@/components/markdown/ScMarkdownEditor.vue'
 import VoteButtons from '@/components/ui/VoteButtons.vue'

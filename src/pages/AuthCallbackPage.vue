@@ -2,7 +2,7 @@
 import { onMounted, ref } from 'vue'
 import { useRoute, useRouter } from 'vue-router'
 import { IconClose, IconLogin, IconSchedule } from '@/icons'
-import { M3Button, M3Icon } from '@/components/m3'
+import { M3Button, M3Icon } from '@clderystd/m3-ui'
 import { authApi } from '@/api/auth'
 import { useAuth } from '@/composables/useAuth'
 import { useSnackbar } from '@/composables/useSnackbar'

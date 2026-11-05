@@ -2,7 +2,7 @@
 /** Drag-and-drop file picker used by the publish form. */
 import { computed, ref } from 'vue'
 import { IconClose, IconCloudUpload, IconFolderZip, IconUpload } from '@/icons'
-import { M3Button, M3Icon, M3IconButton } from '@/components/m3'
+import { M3Button, M3Icon, M3IconButton } from '@clderystd/m3-ui'
 
 const props = withDefaults(
   defineProps<{

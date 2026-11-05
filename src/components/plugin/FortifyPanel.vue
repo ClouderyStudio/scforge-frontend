@@ -12,7 +12,7 @@
  */
 import { computed, onMounted, ref, watch } from 'vue'
 import { IconDelete, IconKey, IconShield, IconVerified, IconWarning } from '@/icons'
-import { M3Button, M3Dialog, M3Icon, M3IconButton, M3Tooltip } from '@/components/m3'
+import { M3Button, M3Dialog, M3Icon, M3IconButton, M3Tooltip } from '@clderystd/m3-ui'
 import FileDrop from '@/components/ui/FileDrop.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import { fortifyApi } from '@/api/fortify'

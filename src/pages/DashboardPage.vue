@@ -12,7 +12,7 @@ import {
   IconStorage,
   IconThumbUp,
 } from '@/icons'
-import { M3Button, M3Icon, M3IconButton, M3Tooltip } from '@/components/m3'
+import { M3Button, M3Icon, M3IconButton, M3Tooltip } from '@clderystd/m3-ui'
 import PluginIcon from '@/components/plugin/PluginIcon.vue'
 import EmptyState from '@/components/ui/EmptyState.vue'
 import LoadingSkeleton from '@/components/ui/LoadingSkeleton.vue'

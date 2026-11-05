@@ -11,7 +11,7 @@
  */
 import { ref } from 'vue'
 import { IconLock, IconShield } from '@/icons'
-import { M3Button, M3Icon } from '@/components/m3'
+import { M3Button, M3Icon } from '@clderystd/m3-ui'
 import { accessApi } from '@/api/plugins'
 import { ApiError, setAccessToken } from '@/api/http'
 import type { AccessMode } from '@/api/types'

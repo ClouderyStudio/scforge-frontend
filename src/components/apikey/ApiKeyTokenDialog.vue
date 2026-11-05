@@ -10,7 +10,7 @@
  */
 import { computed, ref, watch } from 'vue'
 import { IconCheck, IconContentCopy, IconKey, IconWarning } from '@/icons'
-import { M3Button, M3Dialog, M3Icon } from '@/components/m3'
+import { M3Button, M3Dialog, M3Icon } from '@clderystd/m3-ui'
 import type { ApiKeyScope } from '@/api/types'
 import { curlExample } from '@/data/apiKeys'
 

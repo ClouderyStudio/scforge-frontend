@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed } from 'vue'
 import { IconChevronLeft, IconChevronRight } from '@/icons'
-import { M3IconButton } from '@/components/m3'
+import { M3IconButton } from '@clderystd/m3-ui'
 
 const props = defineProps<{ page: number; totalPages: number }>()
 const emit = defineEmits<{ (e: 'update:page', value: number): void }>()

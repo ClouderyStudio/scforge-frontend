@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, ref } from 'vue'
 import { IconSend } from '@/icons'
-import { M3Button } from '@/components/m3'
+import { M3Button } from '@clderystd/m3-ui'
 
 const props = withDefaults(
   defineProps<{

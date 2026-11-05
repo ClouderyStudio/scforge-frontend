@@ -7,7 +7,7 @@
  */
 import { computed } from 'vue'
 import { IconThumbDown, IconThumbUp } from '@/icons'
-import { M3Icon } from '@/components/m3'
+import { M3Icon } from '@clderystd/m3-ui'
 import { formatCount } from '@/utils/format'
 
 const props = withDefaults(

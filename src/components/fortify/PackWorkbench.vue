@@ -12,7 +12,7 @@
  */
 import { computed, ref, watch } from 'vue'
 import { IconDownload, IconFolderZip, IconKey, IconVerified } from '@/icons'
-import { M3Button, M3Icon } from '@/components/m3'
+import { M3Button, M3Icon } from '@clderystd/m3-ui'
 import FileDrop from '@/components/ui/FileDrop.vue'
 import { fortifyApi } from '@/api/fortify'
 import { apiUrl } from '@/api/http'

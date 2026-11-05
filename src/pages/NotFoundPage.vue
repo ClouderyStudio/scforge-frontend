@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { useRouter } from 'vue-router'
 import { IconHome, IconSearch } from '@/icons'
-import { M3Button } from '@/components/m3'
+import { M3Button } from '@clderystd/m3-ui'
 
 const router = useRouter()
 </script>
