@@ -1,7 +1,7 @@
 /**
  * Authenticated file download.
  *
- * The plugin archive endpoint sits behind the Casdoor cookie session, so a plain
+ * The plugin archive endpoint sits behind the 云术统一身份认证 cookie session, so a plain
  * `<a href>` would not carry credentials. Fetch the blob, then hand it to a
  * temporary object URL so the browser still shows its normal save flow.
  *

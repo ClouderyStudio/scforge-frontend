@@ -57,7 +57,7 @@ export function localInputToIso(value: string): string | null {
  * 作用域只列出这把 Key 实际持有的，让读者一眼看出"发版机器需要哪几个"。
  */
 export function curlExample(apiKey: { token: string; scopes: ApiKeyScope[] }): string {
-  const base = 'https://api.cldery.com'
+  const base = 'https://api.cloudery.cn'
   const header = `-H "Authorization: Bearer ${apiKey.token}"`
   if (apiKey.scopes.includes('publish')) {
     return [

@@ -103,9 +103,10 @@ async function signOut(): Promise<void> {
     reset()
     resetAdmin()
     snackbar.success('已退出登录')
-    // Clear the Casdoor-side session too, then come back to the catalogue.
-    if (result?.casdoorLogoutUrl) {
-      window.location.assign(`${result.casdoorLogoutUrl}?redirect=${encodeURIComponent(window.location.origin)}`)
+    // 只有仍在 Casdoor 通道时（灰度回滚期间）才需要去上游清会话；
+    // 自建通道下 logoutUrl 是 null，本地 Cookie 已由后端清掉，直接回首页即可。
+    if (result?.logoutUrl) {
+      window.location.assign(`${result.logoutUrl}?redirect=${encodeURIComponent(window.location.origin)}`)
       return
     }
   } catch {

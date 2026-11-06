@@ -1,7 +1,7 @@
 /**
  * Session state for the signed-in user.
  *
- * SCForge reuses the Cloudery Casdoor cookie session issued by
+ * SCForge reuses the 云术统一身份认证 cookie session issued by
  * `/identity/auth/*`; this store only caches `/identity/auth/me` for the UI.
  */
 import { computed, readonly, ref } from 'vue'

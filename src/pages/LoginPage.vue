@@ -25,10 +25,8 @@ function redirectTarget(): string {
 }
 
 /**
- * Kick off the Casdoor authorization-code flow.
- *
- * The API leaves the user on their own callback page, so the redirect back to
- * this app carries `code` and `state`; the callback page finishes the exchange.
+ * 发起授权码登录：授权端点是云术身份中心自己（后端 /login/oauth/authorize），
+ * 不再是 Casdoor。浏览器带着 code 与 state 回到本应用的 /auth/callback 完成兑换。
  */
 async function startLogin(): Promise<void> {
   busy.value = true
@@ -36,11 +34,11 @@ async function startLogin(): Promise<void> {
   try {
     const [config, stateResult] = await Promise.all([authApi.config(), authApi.state()])
     const redirectUri = `${window.location.origin}/auth/callback`
-    const authorizeUrl = new URL(`${config.casdoor.endpoint}/login/oauth/authorize`)
-    authorizeUrl.searchParams.set('client_id', config.casdoor.clientId)
+    const authorizeUrl = new URL(`${config.identity.endpoint}/login/oauth/authorize`)
+    authorizeUrl.searchParams.set('client_id', config.identity.clientId)
     authorizeUrl.searchParams.set('response_type', 'code')
     authorizeUrl.searchParams.set('redirect_uri', redirectUri)
-    authorizeUrl.searchParams.set('scope', config.casdoor.scope)
+    authorizeUrl.searchParams.set('scope', config.identity.scope)
     authorizeUrl.searchParams.set('state', stateResult.state)
 
     // Remember where to land once the callback finishes.
@@ -70,7 +68,7 @@ onMounted(async () => {
         </p>
         <h1 class="md-typescale-display-small">登录后开始<br />发布与讨论</h1>
         <p class="md-typescale-body-large sc-muted">
-          SCForge 使用云术统一身份认证（Casdoor）。登录成功后，你可以在本平台发布插件、评论和投票。
+          SCForge 使用云术统一身份认证登录。登录成功后，你可以在本平台发布插件、评论和投票。
         </p>
 
         <ul class="sc-login__benefits">

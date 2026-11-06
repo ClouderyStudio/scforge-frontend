@@ -316,11 +316,10 @@ export interface AccountUser {
   avatar: string | null
 }
 
-export interface CasdoorConfig {
-  casdoor: {
+/** `GET /identity/auth/config` 的响应：自建身份中心签发的授权端点参数。 */
+export interface IdentityConfig {
+  identity: {
     endpoint: string
-    organizationName: string
-    applicationName: string
     clientId: string
     scope: string
   }

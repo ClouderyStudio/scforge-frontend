@@ -1,7 +1,7 @@
 /**
  * Thin fetch wrapper for the ClouderyApi backend.
  *
- * The session lives in an HttpOnly Casdoor cookie, so every request sends
+ * The session lives in an HttpOnly 统一身份认证 cookie, so every request sends
  * `credentials: 'include'` — there is no token for the frontend to hold.
  */
 import type { ApiErrorBody } from './types'

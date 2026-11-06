@@ -1,10 +1,10 @@
-/** Casdoor session endpoints (ClouderyApi Modules/Identity). */
+/** 会话与登录端点（ClouderyApi Modules/Identity，自建身份中心）。 */
 import { http } from './http'
-import type { AccountUser, CasdoorConfig } from './types'
+import type { AccountUser, IdentityConfig } from './types'
 
 export const authApi = {
-  /** Casdoor metadata plus this API's callback URI. */
-  config: () => http.get<{ success: boolean } & CasdoorConfig>('/identity/auth/config'),
+  /** 自建身份中心的授权参数 + 本 API 的回调地址。 */
+  config: () => http.get<{ success: boolean } & IdentityConfig>('/identity/auth/config'),
 
   /** One-time OAuth state, mirrored into an HttpOnly cookie server-side. */
   state: () => http.get<{ success: boolean; state: string }>('/identity/auth/state'),
@@ -25,5 +25,5 @@ export const authApi = {
     return result.isAuthenticated && result.user ? result.user : null
   },
 
-  logout: () => http.post<{ success: boolean; message: string; casdoorLogoutUrl: string }>('/identity/auth/logout', {}),
+  logout: () => http.post<{ success: boolean; message: string; logoutUrl: string | null }>('/identity/auth/logout', {}),
 }

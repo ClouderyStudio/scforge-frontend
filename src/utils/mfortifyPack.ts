@@ -29,7 +29,7 @@ const NONCE_LEN = 12
 const TAG_LEN = 16
 
 /** 游戏客户端取密钥的服务主机（锚点，2026-10-16 定稿；换后端靠 DNS/反代，此值不动）。 */
-export const FORTIFY_SERVICE_HOST = 'api.cldery.com'
+export const FORTIFY_SERVICE_HOST = 'api.cloudery.cn'
 
 /* ------------------------------- 小端缓冲写入 ------------------------------- */
 
