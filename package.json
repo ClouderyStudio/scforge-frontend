@@ -10,7 +10,7 @@
     "theme": "node --import ./scripts/register-extensionless.mjs scripts/generate-m3-theme.mjs"
   },
   "dependencies": {
-    "@clderystd/m3-ui": "0.1.0",
+    "@clderystd/m3-ui": "0.2.0",
     "dompurify": "^3.4.16",
     "marked": "^16.4.2",
     "vue": "^3.5.42",

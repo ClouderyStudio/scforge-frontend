@@ -2,7 +2,7 @@
 import { RouterView } from 'vue-router'
 import AppHeader from '@/components/layout/AppHeader.vue'
 import AppFooter from '@/components/layout/AppFooter.vue'
-import SnackbarHost from '@/components/ui/SnackbarHost.vue'
+import { M3SnackbarHost } from '@clderystd/m3-ui'
 import { useAuth } from '@/composables/useAuth'
 
 // Every route renders inside the shell, so the header can reflect the session.
@@ -26,7 +26,7 @@ void load()
 
     <AppFooter />
 
-    <SnackbarHost />
+    <M3SnackbarHost />
   </div>
 </template>
 

@@ -1,2 +1,2 @@
 minimumReleaseAgeExclude:
-  - '@clderystd/m3-ui@0.1.0'
+  - '@clderystd/m3-ui@0.1.0 || 0.2.0'

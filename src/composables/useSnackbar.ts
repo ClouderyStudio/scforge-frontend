@@ -1,41 +1,38 @@
 /**
- * Global snackbar queue.
+ * 全局提示条（MD3 Snackbar）。
  *
- * A single M3-styled host (ScSnackbarHost) renders the current message, so any
- * component can report success or failure without threading props.
+ * 实现已上移到组件库的 `useSnackbar()`：提示条本身是站点通用的，
+ * 身份中心与 SCForge 都在用同一套；各自维护一份会在时长、色调上分叉。
+ *
+ * 这个文件保留 `useSnackbar` 这个名字只为不动 22 个页面 / 43 处调用，
+ * 并额外兼容旧的 `(text, tone, timeout)` 位置参数写法。
+ * **新代码请直接用组件库的 `useSnackbar()`**。
  */
-import { readonly, ref } from 'vue'
+import { useSnackbar as useSharedSnackbar } from '@clderystd/m3-ui'
 
-export type SnackbarTone = 'neutral' | 'success' | 'error'
-
-export interface SnackbarMessage {
-  id: number
-  text: string
-  tone: SnackbarTone
-  timeout: number
-}
-
-const current = ref<SnackbarMessage | null>(null)
-let nextId = 1
-let timer = 0
-
-function hide(): void {
-  window.clearTimeout(timer)
-  current.value = null
-}
-
-function show(text: string, tone: SnackbarTone = 'neutral', timeout = 4000): void {
-  window.clearTimeout(timer)
-  current.value = { id: nextId++, text, tone, timeout }
-  if (timeout > 0) timer = window.setTimeout(hide, timeout)
-}
+export type SnackbarTone = 'neutral' | 'success' | 'error' | 'warning'
 
 export function useSnackbar() {
+  const snackbar = useSharedSnackbar()
+
+  /**
+   * 旧签名 `show(text, tone, timeout)` 与组件库的 `show(text, options)` 并存：
+   * 直接透传 options 形式的调用，位置参数形式在调用点逐个改成新写法前先继续工作。
+   */
+  function show(text: string, toneOrOptions?: SnackbarTone | { tone?: SnackbarTone; title?: string; timeout?: number }, timeout?: number) {
+    if (typeof toneOrOptions === 'string') {
+      snackbar.show(text, { tone: toneOrOptions, ...(timeout !== undefined ? { timeout } : {}) })
+      return
+    }
+    snackbar.show(text, toneOrOptions ?? {})
+  }
+
   return {
-    message: readonly(current),
-    hide,
+    message: snackbar.current,
+    hide: snackbar.hide,
     show,
-    success: (text: string) => show(text, 'success'),
-    error: (text: string) => show(text, 'error', 6000),
+    success: snackbar.success,
+    error: snackbar.error,
+    warning: snackbar.warning,
   }
 }
