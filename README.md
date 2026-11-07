@@ -165,7 +165,6 @@ src/
 
 ## 许可证
 
-本项目采用 **GNU Affero General Public License v3.0（AGPL-3.0）** 授权。
+本项目采用 **GNU Affero General Public License v3.0（AGPL-3.0）** 授权，完整许可证文本见仓库根目录的 [LICENSE](LICENSE)。
 
-AGPL-3.0 是强 copyleft 协议：可以自由使用、修改和分发本项目，但若将修改后的版本作为网络服务对外提供，
-必须以相同协议开放其源代码。
+AGPL-3.0 是强 copyleft 协议：可以自由使用、修改和分发本项目，但若将修改后的版本作为网络服务对外提供，必须以相同协议开放其源代码。
